@@ -18,6 +18,7 @@ module TSOS {
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
 
+
         constructor() {
 
         }
@@ -73,6 +74,20 @@ module TSOS {
             sc = new ShellCommand(this.shellPrompt,
                                   "prompt",
                                   "<string> - Sets the prompt.");
+            this.commandList[this.commandList.length] = sc;
+
+            //date
+            sc = new ShellCommand(this.shellDateTime,
+                "datetime",
+                "- Tells you the date and time.");
+            this.commandList[this.commandList.length] = sc;
+
+            //location
+            sc = new ShellCommand(this.shellLocation, "whereami", "- Tells you what stage you are on.");
+            this.commandList[this.commandList.length] = sc;
+
+            //travel to new location
+            sc = new ShellCommand(this.shellTravel, "travel", "- Travels you to a new location with a new challenger!");
             this.commandList[this.commandList.length] = sc;
 
             // processes - list the running processes and their IDs
@@ -277,6 +292,63 @@ module TSOS {
             } else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
+        }
+
+        public shellDateTime()
+        {
+                var d = new Date();
+                d.setTime(Date.now());
+               _StdOut.putText("The date is: " + d.getDate() + "/" + d.getDay() + "/" + d.getFullYear());
+               _StdOut.advanceLine();
+                var hours = d.getHours();
+            if(hours > 12) {
+                _StdOut.putText("The time is: " + (hours - 12) + ":" + d.getMinutes() + ":" + d.getSeconds() + " P.M.");
+            }
+            else
+            {
+                _StdOut.putText("The time is: " + hours + ":" + d.getMinutes() + ":" + d.getSeconds() + " A.M.");
+            }
+        }
+        public shellTravel()
+        {
+            STAGE =  Math.floor(Math.random() * 8);
+            _StdOut.putText("Now traveling to new stage!");
+        }
+        public shellLocation()
+        {
+            var s = STAGE;
+            switch(s){
+                case 0:
+                    _StdOut.putText("Current Location: USA.");
+                    break;
+                case 1:
+                    _StdOut.putText("Current Location: Canada.");
+                    break;
+                case 2:
+                    _StdOut.putText("Current Location: Brazil.");
+                    break;
+                case 3:
+                    _StdOut.putText("Current Location: Japan.");
+                    break;
+                case 4:
+                    _StdOut.putText("Current Location: Soviet Union.");
+                    break;
+                case 5:
+                    _StdOut.putText("Current Location: China.");
+                    break;
+                case 6:
+                    _StdOut.putText("Current Location: India.");
+                    break;
+                case 7:
+                    _StdOut.putText("Current Location: Unknown Laboratory!");
+                    break;
+                case 8:
+                    _StdOut.putText("Current Location: Ancient temple!!!!")
+                default:
+                    _StdOut.putText("SHIT BE FUCKED UP BRA!");
+            }
+            _StdOut.advanceLine();
+            _StdOut.putText(s);
         }
 
     }
