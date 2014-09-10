@@ -49,6 +49,9 @@ module TSOS {
                 } else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
+                    if((this.buffer.length % 47) == 0 && this.buffer.length != 0) {
+                        this.advanceLine();
+                    }
                     this.putText(chr);
                     // ... and add it to our buffer.
                     this.buffer += chr;
@@ -77,6 +80,7 @@ module TSOS {
             this.currentXPosition = 0;
             this.currentYPosition += _DefaultFontSize + _FontHeightMargin;
             // TODO: Handle scrolling. (Project 1)
+            //size of buffer is 29
         }
     }
  }
