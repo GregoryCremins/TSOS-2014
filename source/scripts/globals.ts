@@ -13,7 +13,7 @@
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME: string    = "BEUOS";   // Beat'em up OS
-var APP_VERSION: string = "Vanilla 1.3";   // The first release is vanilla, extra editions will be be indicated.
+var APP_VERSION: string = "Vanilla 1.5";   // The first release is vanilla, extra editions will be be indicated.
 var STAGE: number = 0;
 var STATUS: string = "Type command: status <string> to change your status";
 

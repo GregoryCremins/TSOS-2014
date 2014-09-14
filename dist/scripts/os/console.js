@@ -8,17 +8,21 @@ Note: This is not the Shell.  The Shell is the "command line interface" (CLI) or
 var TSOS;
 (function (TSOS) {
     var Console = (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, history, historyIndex) {
             if (typeof currentFont === "undefined") { currentFont = _DefaultFontFamily; }
             if (typeof currentFontSize === "undefined") { currentFontSize = _DefaultFontSize; }
             if (typeof currentXPosition === "undefined") { currentXPosition = 0; }
             if (typeof currentYPosition === "undefined") { currentYPosition = _DefaultFontSize; }
             if (typeof buffer === "undefined") { buffer = ""; }
+            if (typeof history === "undefined") { history = []; }
+            if (typeof historyIndex === "undefined") { historyIndex = history.length; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
+            this.history = history;
+            this.historyIndex = historyIndex;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -43,6 +47,8 @@ var TSOS;
                 if (chr === String.fromCharCode(13)) {
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
+                    this.history[this.history.length] = this.buffer;
+                    this.historyIndex = this.history.length;
                     _OsShell.handleInput(this.buffer);
 
                     // ... and reset our buffer.
@@ -54,16 +60,50 @@ var TSOS;
                         this.backSpace(removeChar);
                         //this.buffer += "J";
                     } else {
-                        // This is a "normal" character, so ...
-                        // ... draw it on the screen...
-                        //the first wrapping text attempt
-                        // if ((this.buffer.length % 47) == 0 && this.buffer.length != 0) {
-                        //   this.advanceLine();
-                        //}
-                        this.putText(chr);
+                        //tab command to autocomplete a line
+                        if (chr == String.fromCharCode(9)) {
+                            var currentBuffer = this.buffer.toString();
+                            var foundMatch = false;
+                            var currentCommands = ["ver", "help", "shutdown", "cls", "man", "trace", "rot13", "prompt", "status", "datetime", "whereami", "travel"];
 
-                        // ... and add it to our buffer.
-                        this.buffer += chr;
+                            for (var k = 0; k < currentCommands.length; k++) {
+                                if ((this.inOrderContains(currentBuffer, currentCommands[k])) && foundMatch == false) {
+                                    currentBuffer = currentCommands[k];
+                                    foundMatch = true;
+                                }
+                            }
+
+                            if (foundMatch) {
+                                this.replaceBuffer(currentBuffer);
+                            }
+                        } else {
+                            if (chr == "upArrow") {
+                                if (this.historyIndex > 0) {
+                                    var historyCommand = this.history[this.historyIndex - 1];
+                                    this.replaceBuffer(historyCommand);
+                                    this.historyIndex = this.historyIndex - 1;
+                                }
+                            } else {
+                                if (chr == "downArrow") {
+                                    if (this.historyIndex < this.history.length - 1) {
+                                        var historyCommand = this.history[this.historyIndex + 1];
+                                        this.replaceBuffer(historyCommand);
+                                        this.historyIndex = this.historyIndex + 1;
+                                    }
+                                } else {
+                                    // This is a "normal" character, so ...
+                                    // ... draw it on the screen...
+                                    //the first wrapping text attempt
+                                    // if ((this.buffer.length % 47) == 0 && this.buffer.length != 0) {
+                                    //   this.advanceLine();
+                                    //}
+                                    this.putText(chr);
+
+                                    // ... and add it to our buffer.
+                                    this.buffer += chr;
+                                }
+                            }
+                        }
                     }
                 }
                 // TODO: Write a case for Ctrl-C.
@@ -99,6 +139,37 @@ var TSOS;
             _DrawingContext.clearRect(this.currentXPosition - charLength, ((this.currentYPosition - yHeight) + 5), charLength, yHeight);
             if (this.currentXPosition > 0) {
                 this.currentXPosition = this.currentXPosition - charLength;
+            }
+        };
+
+        //function to check if a smaller sting is contained within the larger string
+        //stating at char 0
+        Console.prototype.inOrderContains = function (smallText, largeText) {
+            var isStillMatching = true;
+            if (smallText.length >= largeText.length) {
+                return false;
+            } else {
+                for (var i = 0; i < smallText.length; i++) {
+                    if (smallText.charAt(i) != largeText.charAt(i)) {
+                        isStillMatching = false;
+                    }
+                }
+            }
+            return isStillMatching;
+        };
+
+        //function to replace the buffer on the screen and behind the scenes
+        Console.prototype.replaceBuffer = function (text) {
+            for (var i = this.buffer.length; i > 0; i--) {
+                var removeChar = this.buffer.charAt(this.buffer.length - 1);
+                this.buffer = this.buffer.substring(0, this.buffer.length - 1);
+                this.backSpace(removeChar);
+            }
+
+            //then add the new characters
+            this.buffer = text;
+            for (var j = 0; j < this.buffer.length; j++) {
+                this.putText(this.buffer.charAt(j));
             }
         };
         return Console;

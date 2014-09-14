@@ -283,7 +283,36 @@ var TSOS;
         Shell.prototype.shellDateTime = function () {
             var d = new Date();
             d.setTime(Date.now());
-            _StdOut.putText("The date is: " + d.getDate() + "/" + d.getDay() + "/" + d.getFullYear());
+            var day = d.getDay();
+            var stringDay = "";
+            switch (day) {
+                case 0:
+                    stringDay = "Sun";
+                    break;
+                case 1:
+                    stringDay = "Mon";
+                    break;
+                case 2:
+                    stringDay = "Tues";
+                    break;
+                case 3:
+                    stringDay = "Wed";
+                    break;
+                case 4:
+                    stringDay = "Thurs";
+                    break;
+                case 5:
+                    stringDay = "Fri";
+                    break;
+                case 6:
+                    stringDay = "Sat";
+                    break;
+                default:
+                    "GARBAGE DAY!";
+                    break;
+            }
+
+            _StdOut.putText("The date is: " + stringDay + ", " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear());
             _StdOut.advanceLine();
             var hours = d.getHours();
             if (hours > 12) {
