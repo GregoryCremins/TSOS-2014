@@ -2,6 +2,14 @@
 
 body {
   background: #909193 url(../images/linen.png) repeat;
+  /* testing awesome background
+  background: #909193 url(../images/finaltest.gif) no-repeat;
+         -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+        */
+
   font-family: Helvetica, Verdana, Arial, sans-serif;
   font-size: 12pt;
   font-weight: normal;

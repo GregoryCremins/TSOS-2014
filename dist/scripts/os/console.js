@@ -48,15 +48,23 @@ var TSOS;
                     // ... and reset our buffer.
                     this.buffer = "";
                 } else {
-                    // This is a "normal" character, so ...
-                    // ... draw it on the screen...
-                    if ((this.buffer.length % 47) == 0 && this.buffer.length != 0) {
-                        this.advanceLine();
-                    }
-                    this.putText(chr);
+                    if (chr === String.fromCharCode(8)) {
+                        var removeChar = this.buffer.charAt(this.buffer.length - 1);
+                        this.buffer = this.buffer.substring(0, this.buffer.length - 1);
+                        this.backSpace(removeChar);
+                        //this.buffer += "J";
+                    } else {
+                        // This is a "normal" character, so ...
+                        // ... draw it on the screen...
+                        //the first wrapping text attempt
+                        // if ((this.buffer.length % 47) == 0 && this.buffer.length != 0) {
+                        //   this.advanceLine();
+                        //}
+                        this.putText(chr);
 
-                    // ... and add it to our buffer.
-                    this.buffer += chr;
+                        // ... and add it to our buffer.
+                        this.buffer += chr;
+                    }
                 }
                 // TODO: Write a case for Ctrl-C.
             }
@@ -84,6 +92,14 @@ var TSOS;
             this.currentYPosition += _DefaultFontSize + _FontHeightMargin;
             // TODO: Handle scrolling. (Project 1)
             //size of buffer is 29
+        };
+        Console.prototype.backSpace = function (text) {
+            var charLength = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+            var yHeight = _DefaultFontSize + _FontHeightMargin;
+            _DrawingContext.clearRect(this.currentXPosition - charLength, ((this.currentYPosition - yHeight) + 5), charLength, yHeight);
+            if (this.currentXPosition > 0) {
+                this.currentXPosition = this.currentXPosition - charLength;
+            }
         };
         return Console;
     })();

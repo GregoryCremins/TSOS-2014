@@ -76,6 +76,11 @@ module TSOS {
                                   "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
 
+            //status
+            sc = new ShellCommand(this.shellStatusUpdate,
+                                    "status",
+                                    "<string> - Sets the status");
+            this.commandList[this.commandList.length] = sc;
             //date
             sc = new ShellCommand(this.shellDateTime,
                 "datetime",
@@ -349,6 +354,16 @@ module TSOS {
             }
             _StdOut.advanceLine();
             _StdOut.putText(s);
+        }
+        public shellStatusUpdate(args)
+         {
+            if (args.length > 0) {
+                STATUS = args[0];
+            } else {
+                _StdOut.putText("Usage: status <string>  Please supply a string.");
+            }
+
+
         }
 
     }
