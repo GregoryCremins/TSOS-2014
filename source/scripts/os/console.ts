@@ -122,20 +122,41 @@ module TSOS {
             // Then I remembered that JavaScript is (sadly) untyped and it won't differentiate
             // between the two.  So rather than be like PHP and write two (or more) functions that
             // do the same thing, thereby encouraging confusion and decreasing readability, I
-            // decided to write one function and use the term "text" to connote string or char.
+            // decided to w;rite one function and use the term "text" to connote string or char.
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
-            if (text !== "") {
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                // Move the current X position.
-                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                this.currentXPosition = this.currentXPosition + offset;
+            //THIS IS THE AMAZING LINE WRAPPING
+            if(text.length > 1)
+            {
+                for(var i = 0; i < text.length; i++)
+                {
+                    this.putText(text.charAt(i));
+                }
+            }
+            else {
+                if (text !== "") {
+                    // Draw the text at the current X and Y coordinates.
+                    var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+                    if((this.currentXPosition + offset) > 500)
+                    {
+                        this.advanceLine();
+                    }
+                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
+                    // Move the current X position.
+                   this.currentXPosition = this.currentXPosition + offset;
+                }
             }
          }
 
         public advanceLine(): void {
             this.currentXPosition = 0;
-            this.currentYPosition += _DefaultFontSize + _FontHeightMargin;
+            //the scrolling of destiny
+            if((this.currentYPosition + _DefaultFontSize + _FontHeightMargin) < _DrawingContext.canvas.height) {
+                this.currentYPosition += _DefaultFontSize + _FontHeightMargin;
+            }
+            else
+            {
+                this.scrollUp();
+            }
             // TODO: Handle scrolling. (Project 1)
             //size of buffer is 29
         }
@@ -182,6 +203,14 @@ module TSOS {
             {
                 this.putText(this.buffer.charAt(j));
             }
+        }
+        //method to just scroll the screen
+        public scrollUp()
+        {
+            var yOffset = _DefaultFontSize + _FontHeightMargin;
+            var image = _DrawingContext.getImageData(0, yOffset, _DrawingContext.canvas.width, _DrawingContext.canvas.height);
+            _DrawingContext.putImageData(image,0, 0);
+            _DrawingContext.clearRect(0, _DrawingContext.canvas.height - yOffset,_DrawingContext.canvas.width, _DrawingContext.canvas.height);
         }
     }
  }
