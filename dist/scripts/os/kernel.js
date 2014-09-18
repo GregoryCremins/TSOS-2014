@@ -162,6 +162,8 @@ var TSOS;
 
             // TODO: Display error on console, perhaps in some sort of colored screen. (Perhaps blue?)
             this.krnShutdown();
+            var c = document.getElementById("bsod");
+            _DrawingContext.drawImage(c, 0, 0, 500, 500);
         };
         return Kernel;
     })();

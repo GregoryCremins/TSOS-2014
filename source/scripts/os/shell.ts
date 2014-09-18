@@ -95,6 +95,10 @@ module TSOS {
             sc = new ShellCommand(this.shellTravel, "travel", "- Travels you to a new location with a new challenger!");
             this.commandList[this.commandList.length] = sc;
 
+            //cause blue screen of death
+            sc = new ShellCommand(this.shellBSOD, "lose", "- Causes a blue screen of death image");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -393,7 +397,12 @@ module TSOS {
             } else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
             }
+        }
 
+        public shellBSOD(args) {
+            _StdOut.putText("OH F.....");
+            // Call Kernel trap
+            _Kernel.krnTrapError("Forced Bsod. Why you do dis to me?");
 
         }
 

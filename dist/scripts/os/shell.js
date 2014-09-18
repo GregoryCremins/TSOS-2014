@@ -69,6 +69,10 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellTravel, "travel", "- Travels you to a new location with a new challenger!");
             this.commandList[this.commandList.length] = sc;
 
+            //cause blue screen of death
+            sc = new TSOS.ShellCommand(this.shellBSOD, "lose", "- Causes a blue screen of death image");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -368,6 +372,13 @@ var TSOS;
             } else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
             }
+        };
+
+        Shell.prototype.shellBSOD = function (args) {
+            _StdOut.putText("OH F.....");
+
+            // Call Kernel trap
+            _Kernel.krnTrapError("Forced Bsod. Why you do dis to me?");
         };
         return Shell;
     })();
