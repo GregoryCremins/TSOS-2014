@@ -387,7 +387,9 @@ module TSOS {
         public shellStatusUpdate(args)
          {
             if (args.length > 0) {
-                STATUS = args[0];
+                var newStatus = args[0];
+                _StatusHandler.updateStatus(newStatus);
+                _StdOut.putText("Status Updated");
             } else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
             }

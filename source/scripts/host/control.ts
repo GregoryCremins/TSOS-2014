@@ -34,15 +34,14 @@ module TSOS {
             // Get a global reference to the drawing context.
             _DrawingContext = _Canvas.getContext('2d');
 
-            //Get a global reference for the status bar
-            _StatusCanvas = <HTMLCanvasElement>document.getElementById("statusCanvas");
-
-            _StatusContext = _StatusCanvas.getContext('2d');
-            //enable text functions
-            CanvasTextFunctions.enable(_StatusContext);
-
             // Enable the added-in canvas text functions (see canvastext.ts for provenance and details).
             CanvasTextFunctions.enable(_DrawingContext);   // Text functionality is now built in to the HTML5 canvas. But this is old-school, and fun.
+
+            //enable text functions for status bar
+
+            _StatusCanvas = <HTMLCanvasElement>document.getElementById("statusCanvas");
+            _StatusContext = _StatusCanvas.getContext("2d");
+            _StatusHandler = new TSOS.statusBarHander();
 
             // Clear the log text box.
             // Use the TypeScript cast to HTMLInputElement
@@ -73,6 +72,12 @@ module TSOS {
             var taLog = <HTMLInputElement> document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
             // Optionally update a log database or some streaming service.
+
+
+
+            _StatusHandler.updateStatus(STATUS);
+            document.getElementById("display").focus();
+
         }
 
 
@@ -109,6 +114,8 @@ module TSOS {
             // Stop the interval that's simulating our clock pulse.
             clearInterval(_hardwareClockID);
             // TODO: Is there anything else we need to do here?
+            //update the status to killed
+            _StatusHandler.updateStatus("Halted");
         }
 
         public static hostBtnReset_click(btn): void {

@@ -9,6 +9,7 @@
    </title>
 
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
+   <script type="text/javascript" src="dist/scripts/os/statusBar2.0.js"></script>
    <script type="text/javascript" src="dist/scripts/globals.js"></script>
 
    <!-- Host (Hardware Simulation) Routines -->
@@ -28,9 +29,11 @@
    <script type="text/javascript" src="dist/scripts/os/userCommand.js"></script>
    <script type="text/javascript" src="dist/scripts/os/kernel.js"></script>
 
+
+
    <!-- Other Routines -->
    <script type="text/javascript" src="dist/scripts/utils.js"></script>
-   <script type="text/javascript" src="dist/scripts/os/statusBar.js"></script>
+
    <!-- Uncomment this line below to enable Glados testing -->
    <!-- <script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script> -->
 </head>
@@ -100,10 +103,8 @@
          ></textarea>
       </label>
    </div>
-    <canvas id="statusCanvas" width="200" height="100" style="border:1px solid #000000;">
+   <canvas id="statusCanvas" width="1000" height="50">
     </canvas>
-
-
 <p class="footerText" style="clear:both;">
    <br>
    Copyright &copy; 2008 - 2014 No Rights Reserved.

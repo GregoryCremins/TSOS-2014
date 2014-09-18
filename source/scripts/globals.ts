@@ -13,11 +13,13 @@
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME: string    = "BEUOS";   // Beat'em up OS
-var APP_VERSION: string = "Vanilla 1.7";   // The first release is vanilla, extra editions will be be indicated. 
+var APP_VERSION: string = "Vanilla 1.8";   // The first release is vanilla, extra editions will be be indicated.
 var STAGE: number = 0;
 var STATUS: string = "Type command: status <string> to change your status";
-var _StatusCanvas = null; //Initialized in hostInit();
-var _StatusContext = null; //Initialized in hostInit();
+var _StatusCanvas: HTMLCanvasElement = null; //Initialized in statusBar;
+var _StatusContext = null; //Initialized in statusBar;
+var _StatusHandler = null; //Initialized in statusBar;
+var _StatusBar = null;
 
 var CPU_CLOCK_INTERVAL: number = 100;   // This is in ms, or milliseconds, so 1000 = 1 second.
 
@@ -72,4 +74,5 @@ var Glados: any = null;
 
 var onDocumentLoad = function() {
 	TSOS.Control.hostInit();
+
 };
