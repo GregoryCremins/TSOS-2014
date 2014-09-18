@@ -10,13 +10,12 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME = "BEUOS";
-var APP_VERSION = "Vanilla 1.9";
+var APP_VERSION = "Hyper Turbo 2.0";
 var STAGE = 0;
 var STATUS = "Type command: status <string> to change your status";
 var _StatusCanvas = null;
 var _StatusContext = null;
 var _StatusHandler = null;
-var _StatusBar = null;
 
 var CPU_CLOCK_INTERVAL = 100;
 
@@ -24,6 +23,9 @@ var TIMER_IRQ = 0;
 
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
+
+//program input
+var _ProgramInput = null;
 
 //
 // Global Variables

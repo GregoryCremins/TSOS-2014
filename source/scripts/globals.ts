@@ -13,13 +13,12 @@
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME: string    = "BEUOS";   // Beat'em up OS
-var APP_VERSION: string = "Vanilla 1.9";   // The first release is vanilla, extra editions will be be indicated.
+var APP_VERSION: string = "Hyper Turbo 2.0";   // The first release is vanilla, extra editions will be be indicated.
 var STAGE: number = 0;
 var STATUS: string = "Type command: status <string> to change your status";
 var _StatusCanvas: HTMLCanvasElement = null; //Initialized in statusBar;
 var _StatusContext = null; //Initialized in statusBar;
 var _StatusHandler = null; //Initialized in statusBar;
-var _StatusBar = null;
 
 var CPU_CLOCK_INTERVAL: number = 100;   // This is in ms, or milliseconds, so 1000 = 1 second.
 
@@ -27,6 +26,8 @@ var TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interr
                             // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ: number = 1;
 
+//program input
+var _ProgramInput = null; // Initialized in hostinit
 
 //
 // Global Variables

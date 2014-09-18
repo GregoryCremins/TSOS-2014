@@ -41,6 +41,9 @@ var TSOS;
             // Use the TypeScript cast to HTMLInputElement
             document.getElementById("taHostLog").value = "";
 
+            //Get the program input button
+            _ProgramInput = document.getElementById("taProgramInput");
+
             // Set focus on the start button.
             // Use the TypeScript cast to HTMLInputElement
             document.getElementById("btnStartOS").focus();
@@ -69,7 +72,6 @@ var TSOS;
 
             // Optionally update a log database or some streaming service.
             _StatusHandler.updateStatus(STATUS);
-            document.getElementById("display").focus();
         };
 
         //

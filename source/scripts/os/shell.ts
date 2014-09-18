@@ -81,9 +81,11 @@ module TSOS {
                                     "status",
                                     "<string> - Sets the status");
             this.commandList[this.commandList.length] = sc;
+            //load
+            sc = new ShellCommand(this.shellLoad, "load", "- Loads the program input area value");
+            this.commandList[this.commandList.length] = sc;
             //date
-            sc = new ShellCommand(this.shellDateTime,
-                "datetime",
+            sc = new ShellCommand(this.shellDateTime,"datetime",
                 "- Tells you the date and time.");
             this.commandList[this.commandList.length] = sc;
 
@@ -400,9 +402,40 @@ module TSOS {
         }
 
         public shellBSOD(args) {
-            _StdOut.putText("OH F.....");
             // Call Kernel trap
             _Kernel.krnTrapError("Forced Bsod. Why you do dis to me?");
+
+        }
+
+        public shellLoad()
+        {
+            var text = _ProgramInput.value.toString();
+            var isValid = true;
+
+            for(var i = 0; i < text.length; i++)
+            {
+                var char = text.charCodeAt(i);
+                if((char >= 48 && char <= 57) //numbers
+                ||(char >= 65 && char <= 70) //A-F
+                ||(char ==32)) //space
+                {
+                    isValid = true;
+                }
+                else
+                {
+                    isValid = false;
+                }
+
+            }
+
+            if(isValid)
+            {
+                _StdOut.putText("Program validated and loaded successfully");
+            }
+            else
+            {
+                _StdOut.putText("Program not validated. Accepted characters: spaces, 0-9, and A-F only.")
+            }
 
         }
 
