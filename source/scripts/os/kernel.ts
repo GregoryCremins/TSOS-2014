@@ -62,6 +62,8 @@ module TSOS {
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
+            //update status
+            _StatusHandler.updateStatus("Halted");
             //
             // Unload the Device Drivers?
             // More?
