@@ -163,7 +163,7 @@ module TSOS {
         public backSpace(text): void{
             var charLength = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
             var yHeight = _DefaultFontSize + _FontHeightMargin;
-            _DrawingContext.clearRect(this.currentXPosition - charLength, ((this.currentYPosition - yHeight) + 5), charLength, yHeight);
+            _DrawingContext.clearRect(this.currentXPosition - charLength, ((this.currentYPosition - yHeight) + 3), charLength, yHeight);
             if(this.currentXPosition > 0)
             {
                 this.currentXPosition = this.currentXPosition - charLength;
