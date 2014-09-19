@@ -140,21 +140,19 @@ var TSOS;
         Console.prototype.advanceLine = function () {
             this.currentXPosition = 0;
 
-<<<<<<< HEAD
             //the scrolling of destiny
             if ((this.currentYPosition + _DefaultFontSize + _FontHeightMargin) < _DrawingContext.canvas.height) {
                 this.currentYPosition += _DefaultFontSize + _FontHeightMargin;
             } else {
                 this.scrollUp();
             }
-=======
+
             /*
             * Font size measures from the baseline to the highest point in the font.
             * Font descent measures from the baseline to the lowest point in the font.
             * Font height margin is extra spacing between the lines.
             */
             this.currentYPosition += _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) + _FontHeightMargin;
->>>>>>> 73d811da4ff07dc246298f7104d6cee89509e56e
             // TODO: Handle scrolling. (Project 1)
             //size of buffer is 29
         };
