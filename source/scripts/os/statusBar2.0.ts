@@ -69,6 +69,7 @@ module TSOS
             }
             if(hours >= 12)
             {
+                hours = hours - 12;
                 tod = "PM";
 
             }
