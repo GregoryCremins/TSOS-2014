@@ -331,7 +331,7 @@ var TSOS;
             _StdOut.advanceLine();
             var hours = d.getHours();
             if (hours >= 12) {
-                _StdOut.putText("The time is: " + hours + ":" + minString + ":" + d.getSeconds() + " P.M.");
+                _StdOut.putText("The time is: " + (hours - 12) + ":" + minString + ":" + d.getSeconds() + " P.M.");
             } else {
                 _StdOut.putText("The time is: " + hours + ":" + d.getMinutes() + ":" + d.getSeconds() + " A.M.");
             }
