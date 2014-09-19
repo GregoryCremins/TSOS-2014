@@ -13,12 +13,16 @@
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME: string    = "BEUOS";   // Beat'em up OS
-var APP_VERSION: string = "Hyper Turbo 2.0";   // The first release is vanilla, extra editions will be be indicated.
+var APP_VERSION: string = "Hyper Turbo 2.0";   // The long anticipated second edition extra editions will be be indicated.
+//The current location for whereami
 var STAGE: number = 0;
+//the status
 var STATUS: string = "Type command: status <string> to change your status";
-var _StatusCanvas: HTMLCanvasElement = null; //Initialized in statusBar;
-var _StatusContext = null; //Initialized in statusBar;
-var _StatusHandler = null; //Initialized in statusBar;
+
+//Status bar variables
+var _StatusCanvas: HTMLCanvasElement = null; //Initialized in statusBar2.0;
+var _StatusContext = null; //Initialized in statusBar2.0;
+var _StatusHandler = null; //Initialized in statusBar2.0;
 
 var CPU_CLOCK_INTERVAL: number = 100;   // This is in ms, or milliseconds, so 1000 = 1 second.
 

@@ -11,8 +11,14 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 //
 var APP_NAME = "BEUOS";
 var APP_VERSION = "Hyper Turbo 2.0";
+
+//The current location for whereami
 var STAGE = 0;
+
+//the status
 var STATUS = "Type command: status <string> to change your status";
+
+//Status bar variables
 var _StatusCanvas = null;
 var _StatusContext = null;
 var _StatusHandler = null;

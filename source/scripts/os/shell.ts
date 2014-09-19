@@ -304,12 +304,14 @@ module TSOS {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
         }
-
+        //function to print the date and time
         public shellDateTime()
         {
                 var d = new Date();
                 d.setTime(Date.now());
                 var day = d.getDay();
+                var mins = d.getMinutes();
+                var minString = ""
                 var stringDay = "";
                 switch(day){
                     case 0:
@@ -337,23 +339,32 @@ module TSOS {
                         "GARBAGE DAY!"
                         break;
                 }
-
+                if(mins < 10)
+                {
+                    minString = "0" + mins;
+                }
+                else
+                {
+                    minString = "" + mins;
+                }
                _StdOut.putText("The date is: " + stringDay + ", " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear());
                _StdOut.advanceLine();
                 var hours = d.getHours();
-            if(hours > 12) {
-                _StdOut.putText("The time is: " + (hours - 12) + ":" + d.getMinutes() + ":" + d.getSeconds() + " P.M.");
+            if(hours >= 12) {
+                _StdOut.putText("The time is: " + (hours - 12) + ":" + minString + ":" + d.getSeconds() + " P.M.");
             }
             else
             {
                 _StdOut.putText("The time is: " + hours + ":" + d.getMinutes() + ":" + d.getSeconds() + " A.M.");
             }
         }
+        // function to change the users location
         public shellTravel()
         {
             STAGE =  Math.floor(Math.random() * 8);
             _StdOut.putText("Now traveling to new stage!");
         }
+        //function to tell the user their current location
         public shellLocation()
         {
             var s = STAGE;
@@ -390,6 +401,7 @@ module TSOS {
             _StdOut.advanceLine();
             _StdOut.putText(s);
         }
+        //function to update the status
         public shellStatusUpdate(args)
          {
             if (args.length > 0) {
@@ -400,13 +412,15 @@ module TSOS {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
             }
         }
-
+        //function to cause a blue screen of death
         public shellBSOD(args) {
             // Call Kernel trap
-            _Kernel.krnTrapError("Forced Bsod. Why you do dis to me?");
+            _Kernel.krnTrapError("Forced Bsod. Rage quit.");
 
         }
 
+        //function to load the data from the program input into memory
+        //the loading actually doesn't work, as of right now it only validates the code
         public shellLoad()
         {
             var text = _ProgramInput.value.toString();
@@ -425,9 +439,7 @@ module TSOS {
                 {
                     isValid = false;
                 }
-
             }
-
             if(isValid)
             {
                 _StdOut.putText("Program validated and loaded successfully");

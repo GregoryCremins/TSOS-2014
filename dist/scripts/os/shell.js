@@ -288,10 +288,13 @@ var TSOS;
             }
         };
 
+        //function to print the date and time
         Shell.prototype.shellDateTime = function () {
             var d = new Date();
             d.setTime(Date.now());
             var day = d.getDay();
+            var mins = d.getMinutes();
+            var minString = "";
             var stringDay = "";
             switch (day) {
                 case 0:
@@ -319,20 +322,28 @@ var TSOS;
                     "GARBAGE DAY!";
                     break;
             }
-
+            if (mins < 10) {
+                minString = "0" + mins;
+            } else {
+                minString = "" + mins;
+            }
             _StdOut.putText("The date is: " + stringDay + ", " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear());
             _StdOut.advanceLine();
             var hours = d.getHours();
-            if (hours > 12) {
-                _StdOut.putText("The time is: " + (hours - 12) + ":" + d.getMinutes() + ":" + d.getSeconds() + " P.M.");
+            if (hours >= 12) {
+                _StdOut.putText("The time is: " + (hours - 12) + ":" + minString + ":" + d.getSeconds() + " P.M.");
             } else {
                 _StdOut.putText("The time is: " + hours + ":" + d.getMinutes() + ":" + d.getSeconds() + " A.M.");
             }
         };
+
+        // function to change the users location
         Shell.prototype.shellTravel = function () {
             STAGE = Math.floor(Math.random() * 8);
             _StdOut.putText("Now traveling to new stage!");
         };
+
+        //function to tell the user their current location
         Shell.prototype.shellLocation = function () {
             var s = STAGE;
             switch (s) {
@@ -368,6 +379,8 @@ var TSOS;
             _StdOut.advanceLine();
             _StdOut.putText(s);
         };
+
+        //function to update the status
         Shell.prototype.shellStatusUpdate = function (args) {
             if (args.length > 0) {
                 var newStatus = args[0];
@@ -378,11 +391,14 @@ var TSOS;
             }
         };
 
+        //function to cause a blue screen of death
         Shell.prototype.shellBSOD = function (args) {
             // Call Kernel trap
-            _Kernel.krnTrapError("Forced Bsod. Why you do dis to me?");
+            _Kernel.krnTrapError("Forced Bsod. Rage quit.");
         };
 
+        //function to load the data from the program input into memory
+        //the loading actually doesn't work, as of right now it only validates the code
         Shell.prototype.shellLoad = function () {
             var text = _ProgramInput.value.toString();
             var isValid = true;
@@ -395,7 +411,6 @@ var TSOS;
                     isValid = false;
                 }
             }
-
             if (isValid) {
                 _StdOut.putText("Program validated and loaded successfully");
             } else {
