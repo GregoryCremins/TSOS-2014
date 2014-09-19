@@ -62,7 +62,7 @@ module TSOS {
                         if(chr == String.fromCharCode(9)){ //
                             var currentBuffer = this.buffer.toString();
                             var foundMatch = false;
-                            var currentCommands = ["ver","help","shutdown","cls","man","trace","rot13","prompt","status","datetime","whereami","travel"];
+                            var currentCommands = ["ver","help","shutdown","cls","man","trace","load","rot13","prompt","status","datetime","whereami","travel","lose"];
                             //there is no contains function ARRRGH!
                             //check list of current commands
                             for(var k = 0; k < currentCommands.length; k++) {
