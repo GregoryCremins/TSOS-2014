@@ -62,6 +62,7 @@ var TSOS;
                 minutes = "0" + minutes;
             }
             if (hours >= 12) {
+                hours = hours - 12;
                 tod = "PM";
             }
             return "" + day + " " + month + "/" + date + "/" + year + ", " + hours + ":" + minutes + ":" + seconds + " " + tod;

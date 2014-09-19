@@ -351,6 +351,7 @@ module TSOS {
                _StdOut.advanceLine();
                 var hours = d.getHours();
             if(hours >= 12) {
+                hours = hours - 12;
                 _StdOut.putText("The time is: " + hours + ":" + minString + ":" + d.getSeconds() + " P.M.");
             }
             else
