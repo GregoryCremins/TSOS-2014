@@ -52,29 +52,32 @@ module TSOS {
                     this.buffer = "";
                 } else {
                     if (chr === String.fromCharCode(8)) { //backspace
-                        var removeChar = this.buffer.charAt(this.buffer.length - 1)
-                        this.buffer = this.buffer.substring(0, this.buffer.length - 1);
+                        var removeChar = this.buffer.charAt(this.buffer.length - 1);
                         this.backSpace(removeChar);
+                        this.buffer = this.buffer.substring(0, this.buffer.length - 1);
+
                         //this.buffer += "J";
                     }
                     else {
                         //tab command to autocomplete a line
                         if(chr == String.fromCharCode(9)){ //
                             var currentBuffer = this.buffer.toString();
+                            var returnBuffer = "";
                             var foundMatch = false;
                             var currentCommands = ["ver","help","shutdown","cls","man","trace","load","rot13","prompt","status","datetime","whereami","travel","lose"];
                             //there is no contains function ARRRGH!
                             //check list of current commands
                             for(var k = 0; k < currentCommands.length; k++) {
-                                if ((this.inOrderContains(currentBuffer, currentCommands[k])) && foundMatch == false) {
-                                    currentBuffer = currentCommands[k];
+                                if ((this.inOrderContains(currentBuffer, currentCommands[k]))) {
+                                    returnBuffer += currentCommands[k];
+                                    returnBuffer += " ";
                                     foundMatch = true;
                                 }
                             }
 
                             if(foundMatch)
                             {
-                                this.replaceBuffer(currentBuffer);
+                                this.replaceBuffer(returnBuffer);
                             }
                         }
                         else {
@@ -136,7 +139,7 @@ module TSOS {
                 if (text !== "") {
                     // Draw the text at the current X and Y coordinates.
                     var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                    if((this.currentXPosition + offset) > 500)
+                    if((this.currentXPosition + offset) > _DrawingContext.canvas.width)
                     {
                         this.advanceLine();
                     }
@@ -146,7 +149,6 @@ module TSOS {
                 }
             }
          }
-
         public advanceLine(): void {
             this.currentXPosition = 0;
             //the scrolling of destiny
@@ -163,10 +165,21 @@ module TSOS {
         public backSpace(text): void{
             var charLength = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
             var yHeight = _DefaultFontSize + _FontHeightMargin;
-            _DrawingContext.clearRect(this.currentXPosition - charLength, ((this.currentYPosition - yHeight) + 3), charLength, yHeight);
+            _DrawingContext.clearRect(this.currentXPosition - charLength, ((this.currentYPosition - yHeight) + 3), charLength, yHeight + 3);
             if(this.currentXPosition > 0)
             {
                 this.currentXPosition = this.currentXPosition - charLength;
+            }
+            else {
+                this.currentXPosition = 0;
+                //check if there is more input
+                if (this.buffer.length > 0) {
+                    this.currentYPosition = this.currentYPosition - (_DefaultFontSize + _FontHeightMargin);
+                    var testCharLength = _DrawingContext.measureText(this.buffer);
+                    alert(testCharLength);
+                    this.currentXPosition = testCharLength % 500;
+                    this.backSpace(text);
+                }
             }
 
         }
