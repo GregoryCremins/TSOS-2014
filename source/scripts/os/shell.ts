@@ -82,7 +82,7 @@ module TSOS {
                                     "<string> - Sets the status");
             this.commandList[this.commandList.length] = sc;
             //load
-            sc = new ShellCommand(this.shellLoad, "load", "- Loads the program input area value");
+            sc = new ShellCommand(this.shellLoad, "load", "<string>- Loads the program input area value");
             this.commandList[this.commandList.length] = sc;
             //date
             sc = new ShellCommand(this.shellDateTime,"datetime",
@@ -174,7 +174,7 @@ module TSOS {
             buffer = Utils.trim(buffer);
 
             // 2. Lower-case it.
-            buffer = buffer.toLowerCase();
+            buffer = buffer.substring(0, buffer.indexOf(" ")).toLowerCase() + buffer.substring(buffer.indexOf(" "));
 
             // 3. Separate on spaces so we can determine the command and command-line args, if any.
             var tempList = buffer.split(" ");
@@ -414,7 +414,7 @@ module TSOS {
             }
         }
         //function to cause a blue screen of death
-        public shellBSOD(args) {
+        public shellBSOD() {
             // Call Kernel trap
             _Kernel.krnTrapError("Forced Bsod. Rage quit.");
 
@@ -422,25 +422,29 @@ module TSOS {
 
         //function to load the data from the program input into memory
         //the loading actually doesn't work, as of right now it only validates the code
-        public shellLoad()
+        public shellLoad(args)
         {
-            var text = _ProgramInput.value.toString();
+            var program = args;
             var isValid = true;
-
-            for(var i = 0; i < text.length; i++)
+    for(var j = 0; j < program.length; j++) {
+        var text = program[j];
+        for (var i = 0; i < text.length; i++) {
+            var charcode = text.charCodeAt(i);
+            var char = text[i];
+            if ((charcode >= 48 && char <= 57) //numbers
+                || ((charcode >= 65 && charcode <= 70) && char == char.toUpperCase()))
             {
-                var char = text.charCodeAt(i);
-                if((char >= 48 && char <= 57) //numbers
-                ||(char >= 65 && char <= 70) //A-F
-                ||(char ==32)) //space
-                {
-                    isValid = true;
-                }
-                else
-                {
-                    isValid = false;
-                }
+                isValid = isValid && true;
             }
+            else {
+                isValid = false;
+            }
+        }
+        if(text.length > 2)
+        {
+            isValid = false;
+        }
+    }
             if(isValid)
             {
                 _StdOut.putText("Program validated and loaded successfully");

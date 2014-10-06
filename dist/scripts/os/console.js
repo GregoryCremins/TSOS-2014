@@ -95,10 +95,6 @@ var TSOS;
                                 } else {
                                     // This is a "normal" character, so ...
                                     // ... draw it on the screen...
-                                    //the first wrapping text attempt
-                                    // if ((this.buffer.length % 47) == 0 && this.buffer.length != 0) {
-                                    //   this.advanceLine();
-                                    //}
                                     this.putText(chr);
 
                                     // ... and add it to our buffer.

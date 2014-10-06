@@ -58,7 +58,7 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
 
             //load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Loads the program input area value");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<string>- Loads the program input area value");
             this.commandList[this.commandList.length] = sc;
 
             //date
@@ -155,7 +155,7 @@ var TSOS;
             buffer = TSOS.Utils.trim(buffer);
 
             // 2. Lower-case it.
-            buffer = buffer.toLowerCase();
+            buffer = buffer.substring(0, buffer.indexOf(" ")).toLowerCase() + buffer.substring(buffer.indexOf(" "));
 
             // 3. Separate on spaces so we can determine the command and command-line args, if any.
             var tempList = buffer.split(" ");
@@ -393,22 +393,28 @@ var TSOS;
         };
 
         //function to cause a blue screen of death
-        Shell.prototype.shellBSOD = function (args) {
+        Shell.prototype.shellBSOD = function () {
             // Call Kernel trap
             _Kernel.krnTrapError("Forced Bsod. Rage quit.");
         };
 
         //function to load the data from the program input into memory
         //the loading actually doesn't work, as of right now it only validates the code
-        Shell.prototype.shellLoad = function () {
-            var text = _ProgramInput.value.toString();
+        Shell.prototype.shellLoad = function (args) {
+            var program = args;
             var isValid = true;
-
-            for (var i = 0; i < text.length; i++) {
-                var char = text.charCodeAt(i);
-                if ((char >= 48 && char <= 57) || (char >= 65 && char <= 70) || (char == 32)) {
-                    isValid = true;
-                } else {
+            for (var j = 0; j < program.length; j++) {
+                var text = program[j];
+                for (var i = 0; i < text.length; i++) {
+                    var charcode = text.charCodeAt(i);
+                    var char = text[i];
+                    if ((charcode >= 48 && char <= 57) || ((charcode >= 65 && charcode <= 70) && char == char.toUpperCase())) {
+                        isValid = isValid && true;
+                    } else {
+                        isValid = false;
+                    }
+                }
+                if (text.length > 2) {
                     isValid = false;
                 }
             }
