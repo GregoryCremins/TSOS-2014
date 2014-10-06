@@ -4,7 +4,12 @@
 module TSOS {
     export class memory
     {
-        public memory(){}
+        public memory(
+            )
+        {
+            var accumulator = 0;
+
+        }
 
         //loads an item into memory
         public load(mem)

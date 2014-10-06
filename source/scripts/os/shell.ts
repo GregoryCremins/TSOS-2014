@@ -82,7 +82,7 @@ module TSOS {
                                     "<string> - Sets the status");
             this.commandList[this.commandList.length] = sc;
             //load
-            sc = new ShellCommand(this.shellLoad, "load", "<string>- Loads the program input area value");
+            sc = new ShellCommand(this.shellLoad, "load", "Loads the program input area value");
             this.commandList[this.commandList.length] = sc;
             //date
             sc = new ShellCommand(this.shellDateTime,"datetime",
@@ -422,10 +422,11 @@ module TSOS {
 
         //function to load the data from the program input into memory
         //the loading actually doesn't work, as of right now it only validates the code
-        public shellLoad(args)
+        public shellLoad()
         {
-            var program = args;
+            var program = _ProgramInput.value.toString().split(" ");
             var isValid = true;
+
     for(var j = 0; j < program.length; j++) {
         var text = program[j];
         for (var i = 0; i < text.length; i++) {
@@ -440,7 +441,7 @@ module TSOS {
                 isValid = false;
             }
         }
-        if(text.length > 2)
+        if(text.length > 2 || text.length == 0)
         {
             isValid = false;
         }

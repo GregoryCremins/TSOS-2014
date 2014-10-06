@@ -7,6 +7,7 @@ var TSOS;
         function memory() {
         }
         memory.prototype.memory = function () {
+            var accumulator = 0;
         };
 
         //loads an item into memory
