@@ -23,6 +23,9 @@ var STATUS: string = "Type command: status <string> to change your status";
 var _StatusCanvas: HTMLCanvasElement = null; //Initialized in statusBar2.0;
 var _StatusContext = null; //Initialized in statusBar2.0;
 var _StatusHandler = null; //Initialized in statusBar2.0;
+var _MemoryHandler = null; //Creates a memory handlerS
+var _MemIndex = 0;          //Current index in memory
+var _Memory = [""];                       // Memory for Assembly commands
 
 var CPU_CLOCK_INTERVAL: number = 100;   // This is in ms, or milliseconds, so 1000 = 1 second.
 
@@ -47,6 +50,7 @@ var _DrawingContext = null;             // Initialized in hostInit().
 var _DefaultFontFamily = "sans";        // Ignored, I think. The was just a place-holder in 2008, but the HTML canvas may have use for it.
 var _DefaultFontSize = 13;
 var _FontHeightMargin = 4;              // Additional space added to font size when advancing a line.
+
 
 
 var _Trace: boolean = true;  // Default the OS trace to be on.

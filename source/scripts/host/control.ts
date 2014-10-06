@@ -43,6 +43,10 @@ module TSOS {
             _StatusContext = _StatusCanvas.getContext("2d");
             _StatusHandler = new TSOS.statusBarHander();
 
+
+            //create memory
+            _MemoryHandler = new memory();
+
             // Clear the log text box.
             // Use the TypeScript cast to HTMLInputElement
             (<HTMLInputElement> document.getElementById("taHostLog")).value="";

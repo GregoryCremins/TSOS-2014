@@ -22,6 +22,9 @@ var STATUS = "Type command: status <string> to change your status";
 var _StatusCanvas = null;
 var _StatusContext = null;
 var _StatusHandler = null;
+var _MemoryHandler = null;
+var _MemIndex = 0;
+var _Memory = [""];
 
 var CPU_CLOCK_INTERVAL = 100;
 

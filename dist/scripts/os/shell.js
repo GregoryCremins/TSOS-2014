@@ -419,6 +419,10 @@ var TSOS;
                 }
             }
             if (isValid) {
+                for (var h = 0; h < program.length; h++) {
+                    alert(program[h]);
+                    _MemoryHandler.load(program[h]);
+                }
                 _StdOut.putText("Program validated and loaded successfully");
             } else {
                 _StdOut.putText("Program not validated. Accepted characters: spaces, 0-9, and A-F only.");
