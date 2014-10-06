@@ -149,7 +149,7 @@ var TSOS;
         Console.prototype.backSpace = function (text) {
             var charLength = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
             var yHeight = _DefaultFontSize + _FontHeightMargin;
-            _DrawingContext.clearRect(this.currentXPosition - charLength, ((this.currentYPosition - yHeight) + 3), charLength, yHeight + 3);
+            _DrawingContext.clearRect(this.currentXPosition - charLength - 1, ((this.currentYPosition - yHeight) + 2), charLength + 2, yHeight + 5);
             if (this.currentXPosition > 0) {
                 this.currentXPosition = this.currentXPosition - charLength;
             } else {

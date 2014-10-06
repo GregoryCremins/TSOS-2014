@@ -46,6 +46,11 @@ module TSOS {
 
             //create memory
             _MemoryHandler = new memory();
+            _MemoryElement = (<HTMLInputElement>document.getElementById("memory"));
+            for(var i = 0; i < _Memory.length; i++)
+            {
+                _MemoryElement.value = _MemoryElement.value + _Memory[i] + " ";
+            }
 
             // Clear the log text box.
             // Use the TypeScript cast to HTMLInputElement

@@ -16,8 +16,20 @@ module TSOS {
         {
             _Memory[_MemIndex]= mem;
             _MemIndex++;
-            alert(_Memory);
+            this.updateMem();
+            //shift the focus back and forth
+
         }
+
+        public updateMem()
+        {
+            _MemoryElement.value = "";
+            for(var i = 0; i < _Memory.length; i++)
+            {
+                _MemoryElement.value = _MemoryElement.value + _Memory[i] + " ";
+            }
+        }
+
     }
 
 }

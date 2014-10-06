@@ -13,7 +13,7 @@
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME: string    = "BEUOS";   // Beat'em up OS
-var APP_VERSION: string = "Hyper Turbo 2.0";   // The long anticipated second edition extra editions will be be indicated.
+var APP_VERSION: string = "Hyper Turbo 2.1";   // The supremely heralded third edition extra editions will be be indicated.
 //The current location for whereami
 var STAGE: number = 0;
 //the status
@@ -25,7 +25,8 @@ var _StatusContext = null; //Initialized in statusBar2.0;
 var _StatusHandler = null; //Initialized in statusBar2.0;
 var _MemoryHandler = null; //Creates a memory handlerS
 var _MemIndex = 0;          //Current index in memory
-var _Memory = [""];                       // Memory for Assembly commands
+var _Memory = Array.apply(null, new Array(256)).map(String.prototype.valueOf,"00");                       // Memory for Assembly commands
+var _MemoryElement = null;                // Memory HTML element
 
 var CPU_CLOCK_INTERVAL: number = 100;   // This is in ms, or milliseconds, so 1000 = 1 second.
 

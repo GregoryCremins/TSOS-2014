@@ -448,10 +448,15 @@ module TSOS {
     }
             if(isValid)
             {
+                //Reset memory
+                _Memory = Array.apply(null, new Array(256)).map(String.prototype.valueOf,"00");
+                _MemIndex = 0;
                 for(var h = 0; h < program.length; h++)
                 {
-                    alert(program[h]);
                     _MemoryHandler.load(program[h]);
+                    _MemoryElement.focus();
+                    _Canvas.focus();
+
                 }
                 _StdOut.putText("Program validated and loaded successfully");
             }
