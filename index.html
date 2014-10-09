@@ -10,7 +10,8 @@
 
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
    <script type="text/javascript" src="dist/scripts/os/statusBar2.0.js"></script>
-   <script type="text/javascript" src="dist/scripts/os/memory.js"></script>
+   <script type="text/javascript" src="dist/scripts/os/memoryHandler.js"></script>
+   <script type="text/javascript" src="dist/scripts/os/pcb.js"></script>
    <script type="text/javascript" src="dist/scripts/globals.js"></script>
 
    <!-- Host (Hardware Simulation) Routines -->
@@ -69,6 +70,15 @@
              value="Reset"
              tabindex="2"
              onclick="TSOS.Control.hostBtnReset_click(this);">
+
+       <input type = "button"
+              id = "btnStep"
+              name = "btnStep"
+              class = "normal_button"
+              disabled = "disabled"
+              value = "Step"
+              tabIndex = "3"
+              onclick = "TSOS.Control.hostBtnStep_click(this);">
    </div>
 
    <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
@@ -79,12 +89,12 @@
       </canvas>
    </div>
 <label>
-    Memory
+    Memory And CPU
 <br>
    <textarea name = "memory"
              id = "memory"
-             rows = "16"
-             cols = "48"></textarea>
+             rows = "27"
+             cols = "49"></textarea>
 </label>
    <div id="divLog" style="margin-left:520px;">
       <label>

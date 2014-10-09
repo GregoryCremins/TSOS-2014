@@ -84,6 +84,12 @@ module TSOS {
             //load
             sc = new ShellCommand(this.shellLoad, "load", "Loads the program input area value");
             this.commandList[this.commandList.length] = sc;
+            //run
+            sc = new ShellCommand(this.shellRun, "run","<int> - Runs the process with the given pid");
+            this.commandList[this.commandList.length] = sc;
+            //step
+            sc = new ShellCommand(this.shellStep, "step","<int> -Runs the process with the given pid in single step mode")
+            this.commandList[this.commandList.length] = sc;
             //date
             sc = new ShellCommand(this.shellDateTime,"datetime",
                 "- Tells you the date and time.");
@@ -458,13 +464,35 @@ module TSOS {
                     _Canvas.focus();
 
                 }
-                _StdOut.putText("Program validated and loaded successfully");
+                var test = new PCB();
+                //only handle one PCB right now
+                if(_Processes.length == 0)
+                {
+                    _Processes = _Processes.concat(test);
+                }
+                else
+                {
+                    _Processes[0] = test;
+                }
+                _StdOut.putText("Program validated and loaded successfully. PID = " + _Processes.length);
             }
             else
             {
                 _StdOut.putText("Program not validated. Accepted characters: spaces, 0-9, and A-F only.")
             }
 
+        }
+        public shellRun(pid)
+        {
+            _Processes[pid - 1].loadToCPU();
+        }
+
+        public shellStep(pid)
+        {
+            _Processes[pid - 1].loadToCPU;
+            _CPU.isExecuting = true;
+            _SteppingMode = true;
+            document.getElementById("btnStep").disabled = false;
         }
 
     }

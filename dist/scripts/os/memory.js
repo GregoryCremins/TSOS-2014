@@ -23,6 +23,7 @@ var TSOS;
             for (var i = 0; i < _Memory.length; i++) {
                 _MemoryElement.value = _MemoryElement.value + _Memory[i] + " ";
             }
+            _CPU.updateConsole();
         };
         return memory;
     })();

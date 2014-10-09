@@ -47,10 +47,6 @@ module TSOS {
             //create memory
             _MemoryHandler = new memory();
             _MemoryElement = (<HTMLInputElement>document.getElementById("memory"));
-            for(var i = 0; i < _Memory.length; i++)
-            {
-                _MemoryElement.value = _MemoryElement.value + _Memory[i] + " ";
-            }
 
             // Clear the log text box.
             // Use the TypeScript cast to HTMLInputElement
@@ -114,6 +110,9 @@ module TSOS {
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();
+            //update memory
+            _MemoryHandler.updateMem();
+
         }
 
         public static hostBtnHaltOS_click(btn): void {
@@ -134,6 +133,15 @@ module TSOS {
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        }
+        public static hostBtnStep_click(btn): void
+        {
+            //for single step execution of processes
+            if(_CPU.isExecuting && _SteppingMode == true)
+            {
+                _CPU.cycle();
+            }
+
         }
     }
 }
