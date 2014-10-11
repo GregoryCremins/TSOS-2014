@@ -10,7 +10,7 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME = "BEUOS";
-var APP_VERSION = "Hyper Turbo 2.7";
+var APP_VERSION = "Hyper Turbo 2.8";
 
 //The current location for whereami
 var STAGE = 0;
@@ -23,7 +23,6 @@ var _StatusCanvas = null;
 var _StatusContext = null;
 var _StatusHandler = null;
 var _MemoryHandler = null;
-var _MemIndex = 0;
 var _Memory = Array.apply(null, new Array(256)).map(String.prototype.valueOf, "00");
 var _MemoryElement = null;
 var _Processes = new Array();

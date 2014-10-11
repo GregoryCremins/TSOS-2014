@@ -41,7 +41,7 @@ var TSOS;
 
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            this.handleCommand(_Memory[this.PC]);
+            this.handleCommand(_MemoryHandler.read(this.PC));
         };
 
         Cpu.prototype.updateConsole = function () {
@@ -63,7 +63,7 @@ var TSOS;
             switch (command) {
                 case "A9": {
                     //load a constant
-                    this.Acc = parseInt("0x" + (_Memory[this.PC + 1]));
+                    this.Acc = parseInt("0x" + (_MemoryHandler.read(this.PC + 1)));
                     this.PC = this.PC + 2;
                     _MemoryHandler.updateMem();
                     break;
@@ -71,19 +71,19 @@ var TSOS;
                 case "AD": {
                     //load from memory
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _Memory[this.PC + 2] + _Memory[this.PC + 1]);
-                    this.Acc = parseInt("0x" + _Memory[this.PC]);
+                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    this.Acc = parseInt("0x" + _MemoryHandler.read(this.PC));
                     this.PC = oldPC + 3;
                     _MemoryHandler.updateMem();
                     break;
                 }
                 case "8D": {
                     //store to memory
-                    var memLoc = parseInt("0x" + _Memory[this.PC + 2] + _Memory[this.PC + 1]);
+                    var memLoc = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
                     if (this.Acc < 16) {
-                        _Memory[memLoc] = "0" + this.Acc;
+                        _MemoryHandler.load(("0" + this.Acc), memLoc);
                     } else {
-                        _Memory[memLoc] = this.Acc;
+                        _MemoryHandler.load(this.Acc, memLoc);
                     }
                     this.PC += 3;
                     _MemoryHandler.updateMem();
@@ -92,15 +92,15 @@ var TSOS;
                 case "6D": {
                     //add with carry
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _Memory[this.PC + 2] + _Memory[this.PC + 1]);
-                    this.Acc += parseInt("0x" + _Memory[this.PC]);
+                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    this.Acc += parseInt("0x" + _MemoryHandler.read(this.PC));
                     this.PC = oldPC + 3;
                     _MemoryHandler.updateMem();
                     break;
                 }
                 case "A2": {
                     //load constant into x register
-                    this.Xreg = parseInt("0x" + (_Memory[this.PC + 1]));
+                    this.Xreg = parseInt("0x" + (_MemoryHandler.read(this.PC + 1)));
                     this.PC = this.PC + 2;
                     _MemoryHandler.updateMem();
                     break;
@@ -108,7 +108,7 @@ var TSOS;
                 case "AE": {
                     //load x register from memory
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _Memory[this.PC + 2] + _Memory[this.PC + 1]);
+                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
                     this.Xreg = parseInt("0x" + _Memory[this.PC]);
                     this.PC = oldPC + 3;
                     _MemoryHandler.updateMem();
@@ -116,7 +116,7 @@ var TSOS;
                 }
                 case "A0": {
                     //load constant into y register
-                    this.Yreg = parseInt("0x" + (_Memory[this.PC + 1]));
+                    this.Yreg = parseInt("0x" + (_MemoryHandler.read(this.PC + 1)));
                     this.PC = this.PC + 2;
                     _MemoryHandler.updateMem();
                     break;
@@ -124,8 +124,8 @@ var TSOS;
                 case "AC": {
                     //load y register from memory
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _Memory[this.PC + 2] + _Memory[this.PC + 1]);
-                    this.Yreg = parseInt("0x" + _Memory[this.PC]);
+                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    this.Yreg = parseInt("0x" + _MemoryHandler.read(this.PC));
                     this.PC = oldPC + 3;
                     _MemoryHandler.updateMem();
                     break;
@@ -146,9 +146,10 @@ var TSOS;
                     //Equals compare of memory to the Xreg
                     //first get memory variable
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _Memory[this.PC + 2] + _Memory[this.PC + 1]);
-                    var temp = parseInt("0x" + _Memory[this.PC]);
-                    if (temp = this.Xreg) {
+                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+
+                    var temp = parseInt("0x" + _MemoryHandler.read(this.PC));
+                    if (temp == this.Xreg) {
                         this.Zflag = 1;
                     }
                     this.PC = oldPC + 3;
@@ -158,9 +159,9 @@ var TSOS;
                 case "D0": {
                     //BEQ if z flag is not set, branch
                     if (this.Zflag == 0) {
-                        this.PC = parseInt("0x" + _Memory[this.PC + 2] + _Memory[this.PC + 1]);
+                        this.PC = this.PC - (255 - parseInt("0x" + _MemoryHandler.read(this.PC + 1))) + 1;
                     } else {
-                        this.PC = this.PC + 1;
+                        this.PC = this.PC + 2;
                     }
                     _MemoryHandler.updateMem();
                     break;
@@ -169,31 +170,41 @@ var TSOS;
                     //increment the byte
                     //first read it
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _Memory[this.PC + 2] + _Memory[this.PC + 1]);
-                    var temp = parseInt("0x" + _Memory[this.PC]);
-                    temp = temp + 0x0001;
-                    _Memory[this.PC] = temp.toString().replace("0x", "");
+                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    var temp = parseInt("0x" + _MemoryHandler.read(this.PC));
+                    temp = temp + 1;
+                    _MemoryHandler.load(temp, this.PC);
                     _MemoryHandler.updateMem();
+                    this.PC = oldPC + 3;
                     break;
                 }
                 case "FF": {
                     //System Call, check the Xreg
-                    if (this.Xreg == 0x01) {
+                    if (this.Xreg == 2) {
+                        _StdOut.advanceLine();
+
                         //print the yreg to the screen
-                        _DrawingContext.putText(this.Yreg);
-                        _DrawingContext.advanceLine();
+                        var i = 0;
+                        while (_MemoryHandler.read(this.Yreg + i) != "00" && i < 256) {
+                            var charCode = (parseInt("0x" + _MemoryHandler.read(this.Yreg + i).toString()));
+                            var char = String.fromCharCode(charCode);
+                            _StdOut.putText(char);
+                            i++;
+                        }
                     }
-                    if (this.Xreg == 0x02) {
-                        _DrawingContext.putText(this.Yreg.toString());
-                        _DrawingContext.advanceLine();
+                    if (this.Xreg == 1) {
+                        _StdOut.advanceLine();
+                        _StdOut.putText(" " + this.Yreg);
                     }
                     _MemoryHandler.updateMem();
+                    this.PC += 1;
                     break;
                 }
                 default: {
                     //NOT A VALID HEXCODE
-                    //THROW AN ERROR BITCH
-                    alert("SHIT FUCKED UP HERE " + _Memory[this.PC]);
+                    //THROW AN ERROR
+                    _DrawingContext.putText("Invalid Code");
+                    _DrawingContext.advanceLine();
                     this.isExecuting = false;
                     _MemoryHandler.updateMem();
                     break;

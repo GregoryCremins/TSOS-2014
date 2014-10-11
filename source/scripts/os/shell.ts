@@ -456,10 +456,10 @@ module TSOS {
             {
                 //Reset memory
                 _Memory = Array.apply(null, new Array(256)).map(String.prototype.valueOf,"00");
-                _MemIndex = 0;
+
                 for(var h = 0; h < program.length; h++)
                 {
-                    _MemoryHandler.load(program[h]);
+                    _MemoryHandler.load(program[h],h);
                     _MemoryElement.focus();
                     _Canvas.focus();
 
@@ -484,15 +484,29 @@ module TSOS {
         }
         public shellRun(pid)
         {
-            _Processes[pid - 1].loadToCPU();
+            if(_Processes.length >= pid)
+            {
+                _Processes[pid - 1].loadToCPU();
+            }
+           else
+            {
+                _StdOut.putText("Error: no programs loaded into memory.");
+            }
         }
 
         public shellStep(pid)
         {
-            _Processes[pid - 1].loadToCPU;
-            _CPU.isExecuting = true;
-            _SteppingMode = true;
-            document.getElementById("btnStep").disabled = false;
+            if(_Processes.length >= pid)
+            {
+                _Processes[pid - 1].loadToCPU;
+                _CPU.isExecuting = true;
+                _SteppingMode = true;
+                document.getElementById("btnStep").disabled = false;
+            }
+            else
+            {
+                _StdOut.putText("Error: no programs loaded into memory.");
+            }
         }
 
     }
