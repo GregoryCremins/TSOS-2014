@@ -1,5 +1,6 @@
 /**
  * Created by Greg on 10/5/2014.
+ * class to handle the memory array
  */
 module TSOS {
     export class memory
@@ -41,6 +42,12 @@ module TSOS {
 
         }
 
+        /**
+         * Function to convert the given hex digit to a string
+         * @param digit the hex digit to be converted
+         * @returns {string} the string which is generated
+         * @constructor
+         */
         public ConvertToString(digit)
         {
             switch(digit)
@@ -82,12 +89,20 @@ module TSOS {
                 }
             }
         }
-        //read a hex code from memory
+
+        /**
+         * Function to read a value from memory at the given index
+         * @param index the index which we which to read from memory
+         * @returns {Object} the value at that given index
+         */
         public read(index)
         {
             return _Memory[index];
         }
 
+        /**
+         * Function to update memory on the UI
+         */
         public updateMem()
         {
             _MemoryElement.value = "";
@@ -95,7 +110,7 @@ module TSOS {
             {
                 _MemoryElement.value = _MemoryElement.value + _Memory[i] + " ";
             }
-            _CPU.updateConsole();
+            _CPU.updateUI();
         }
 
 

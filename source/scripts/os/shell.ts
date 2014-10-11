@@ -487,6 +487,7 @@ module TSOS {
             if(_Processes.length >= pid)
             {
                 _Processes[pid - 1].loadToCPU();
+                _currentProcess = pid;
             }
            else
             {
@@ -502,6 +503,7 @@ module TSOS {
                 _CPU.isExecuting = true;
                 _SteppingMode = true;
                 document.getElementById("btnStep").disabled = false;
+                _currentProcess = pid;
             }
             else
             {

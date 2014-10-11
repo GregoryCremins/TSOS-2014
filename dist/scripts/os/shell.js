@@ -452,6 +452,7 @@ var TSOS;
         Shell.prototype.shellRun = function (pid) {
             if (_Processes.length >= pid) {
                 _Processes[pid - 1].loadToCPU();
+                _currentProcess = pid;
             } else {
                 _StdOut.putText("Error: no programs loaded into memory.");
             }
@@ -463,6 +464,7 @@ var TSOS;
                 _CPU.isExecuting = true;
                 _SteppingMode = true;
                 document.getElementById("btnStep").disabled = false;
+                _currentProcess = pid;
             } else {
                 _StdOut.putText("Error: no programs loaded into memory.");
             }

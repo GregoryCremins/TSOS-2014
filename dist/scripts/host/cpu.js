@@ -44,7 +44,10 @@ var TSOS;
             this.handleCommand(_MemoryHandler.read(this.PC));
         };
 
-        Cpu.prototype.updateConsole = function () {
+        /**
+        * Function to update the UI
+        */
+        Cpu.prototype.updateUI = function () {
             _MemoryElement.value += "\n \n";
             _MemoryElement.value += "PC: " + this.PC + "\n";
             _MemoryElement.value += "Acc: " + this.Acc + "\n";
@@ -52,6 +55,15 @@ var TSOS;
             _MemoryElement.value += "Yreg: " + this.Yreg + "\n";
             _MemoryElement.value += "Zflag: " + this.Zflag + "\n";
         };
+
+        /**
+        * Function to load the CPU with the specified values
+        * @param PC
+        * @param Acc
+        * @param Xreg
+        * @param Yreg
+        * @param Zflag
+        */
         Cpu.prototype.load = function (PC, Acc, Xreg, Yreg, Zflag) {
             this.PC = PC;
             this.Acc = Acc;
@@ -59,6 +71,10 @@ var TSOS;
             this.Zflag = Zflag;
         };
 
+        /**
+        * Function to handle the dissasembly command
+        * @param command the command written in 2 digit hex
+        */
         Cpu.prototype.handleCommand = function (command) {
             switch (command) {
                 case "A9": {
@@ -140,6 +156,7 @@ var TSOS;
                     this.isExecuting = false;
                     _MemoryHandler.updateMem();
                     document.getElementById("btnStep").disabled = true;
+                    _currentProcess = 0;
                     break;
                 }
                 case "EC": {
@@ -210,6 +227,14 @@ var TSOS;
                     break;
                 }
             }
+        };
+
+        /**
+        * Function to store the current CPU values back to a given PID
+        * @param PID
+        */
+        Cpu.prototype.storeToPCB = function (PID) {
+            _Processes[PID - 1].storeVals(this.PC, this.Acc, this.Xreg, this.Yreg, this.Zflag);
         };
         return Cpu;
     })();

@@ -45,7 +45,10 @@ module TSOS {
 
         }
 
-        public updateConsole()
+        /**
+         * Function to update the UI
+         */
+        public updateUI()
             {
                 _MemoryElement.value += "\n \n";
                 _MemoryElement.value += "PC: " + this.PC + "\n";
@@ -54,6 +57,15 @@ module TSOS {
                 _MemoryElement.value += "Yreg: " + this.Yreg + "\n";
                 _MemoryElement.value += "Zflag: " + this.Zflag + "\n";
             }
+
+        /**
+         * Function to load the CPU with the specified values
+         * @param PC
+         * @param Acc
+         * @param Xreg
+         * @param Yreg
+         * @param Zflag
+         */
         public load(PC, Acc, Xreg, Yreg, Zflag)
         {
             this.PC = PC;
@@ -62,6 +74,10 @@ module TSOS {
             this.Zflag = Zflag;
         }
 
+        /**
+         * Function to handle the dissasembly command
+         * @param command the command written in 2 digit hex
+         */
         public handleCommand(command)
         {
             switch (command) {
@@ -159,6 +175,7 @@ module TSOS {
                    this.isExecuting = false;
                     _MemoryHandler.updateMem();
                     document.getElementById("btnStep").disabled = true;
+                    _currentProcess = 0;
                     break;
                 }
                 case "EC":
@@ -243,6 +260,15 @@ module TSOS {
 
                 }
              }
+        }
+
+        /**
+         * Function to store the current CPU values back to a given PID
+         * @param PID
+         */
+        public storeToPCB(PID)
+        {
+            _Processes[PID - 1].storeVals(this.PC, this.Acc, this.Xreg, this.Yreg, this.Zflag);
         }
     }
 }
