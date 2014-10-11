@@ -82,7 +82,13 @@ module TSOS {
                                     "<string> - Sets the status");
             this.commandList[this.commandList.length] = sc;
             //load
-            sc = new ShellCommand(this.shellLoad, "load", "- Loads the program input area value");
+            sc = new ShellCommand(this.shellLoad, "load", "Loads the program input area value");
+            this.commandList[this.commandList.length] = sc;
+            //run
+            sc = new ShellCommand(this.shellRun, "run","<int> - Runs the process with the given pid");
+            this.commandList[this.commandList.length] = sc;
+            //step
+            sc = new ShellCommand(this.shellStep, "step","<int> -Runs the process with the given pid in single step mode")
             this.commandList[this.commandList.length] = sc;
             //date
             sc = new ShellCommand(this.shellDateTime,"datetime",
@@ -174,7 +180,7 @@ module TSOS {
             buffer = Utils.trim(buffer);
 
             // 2. Lower-case it.
-            buffer = buffer.toLowerCase();
+            buffer = buffer.substring(0, buffer.indexOf(" ")).toLowerCase() + buffer.substring(buffer.indexOf(" "));
 
             // 3. Separate on spaces so we can determine the command and command-line args, if any.
             var tempList = buffer.split(" ");
@@ -414,7 +420,7 @@ module TSOS {
             }
         }
         //function to cause a blue screen of death
-        public shellBSOD(args) {
+        public shellBSOD() {
             // Call Kernel trap
             _Kernel.krnTrapError("Forced Bsod. Rage quit.");
 
@@ -424,32 +430,88 @@ module TSOS {
         //the loading actually doesn't work, as of right now it only validates the code
         public shellLoad()
         {
-            var text = _ProgramInput.value.toString();
+            var program = _ProgramInput.value.toString().split(" ");
             var isValid = true;
 
-            for(var i = 0; i < text.length; i++)
+    for(var j = 0; j < program.length; j++) {
+        var text = program[j];
+        for (var i = 0; i < text.length; i++) {
+            var charcode = text.charCodeAt(i);
+            var char = text[i];
+            if ((charcode >= 48 && char <= 57) //numbers
+                || ((charcode >= 65 && charcode <= 70) && char == char.toUpperCase()))
             {
-                var char = text.charCodeAt(i);
-                if((char >= 48 && char <= 57) //numbers
-                ||(char >= 65 && char <= 70) //A-F
-                ||(char ==32)) //space
+                isValid = isValid && true;
+            }
+            else {
+                isValid = false;
+            }
+        }
+        if(text.length > 2 || text.length == 0)
+        {
+            isValid = false;
+        }
+    }
+            if(isValid)
+            {
+                //Reset memory
+                _Memory = Array.apply(null, new Array(256)).map(String.prototype.valueOf,"00");
+
+                for(var h = 0; h < program.length; h++)
                 {
-                    isValid = true;
+                    _MemoryHandler.load(program[h],h);
+                    _MemoryElement.focus();
+                    _Canvas.focus();
+
+                }
+                var test = new PCB();
+                //only handle one PCB right now
+                if(_Processes.length == 0)
+                {
+                    _Processes = _Processes.concat(test);
                 }
                 else
                 {
-                    isValid = false;
+                    _Processes[0] = test;
                 }
-            }
-            if(isValid)
-            {
-                _StdOut.putText("Program validated and loaded successfully");
+                _Processes[0].loadToCPU();
+                _StdOut.putText("Program validated and loaded successfully. PID = " + _Processes.length);
+                _MemoryHandler.updateMem();
             }
             else
             {
                 _StdOut.putText("Program not validated. Accepted characters: spaces, 0-9, and A-F only.")
             }
 
+        }
+        public shellRun(pid)
+        {
+            if(_Processes.length >= pid)
+            {
+                _Processes[pid - 1].loadToCPU();
+                _currentProcess = pid;
+                _CPU.isExecuting = true;
+            }
+           else
+            {
+                _StdOut.putText("Error: no programs loaded into memory.");
+            }
+        }
+
+        public shellStep(pid)
+        {
+            if(_Processes.length >= pid)
+            {
+                _Processes[pid - 1].loadToCPU;
+                _CPU.isExecuting = true;
+                _SteppingMode = true;
+                document.getElementById("btnStep").disabled = false;
+                _currentProcess = pid;
+            }
+            else
+            {
+                _StdOut.putText("Error: no programs loaded into memory.");
+            }
         }
 
     }

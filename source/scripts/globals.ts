@@ -13,7 +13,7 @@
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME: string    = "BEUOS";   // Beat'em up OS
-var APP_VERSION: string = "Hyper Turbo 2.0";   // The long anticipated second edition extra editions will be be indicated.
+var APP_VERSION: string = "Hyper Turbo EX Dynamic 3.0";   // The supremely heralded third edition extra editions will be be indicated.
 //The current location for whereami
 var STAGE: number = 0;
 //the status
@@ -23,9 +23,13 @@ var STATUS: string = "Type command: status <string> to change your status";
 var _StatusCanvas: HTMLCanvasElement = null; //Initialized in statusBar2.0;
 var _StatusContext = null; //Initialized in statusBar2.0;
 var _StatusHandler = null; //Initialized in statusBar2.0;
-
+var _MemoryHandler = null; //Creates a memory handlerS
+var _Memory = Array.apply(null, new Array(256)).map(String.prototype.valueOf,"00");                       // Memory for Assembly commands
+var _MemoryElement = null;                // Memory HTML element
+var _currentProcess = 0;                  //the current running process
+var _Processes = new Array<TSOS.PCB>();                      // Array of processes
 var CPU_CLOCK_INTERVAL: number = 100;   // This is in ms, or milliseconds, so 1000 = 1 second.
-
+var _SteppingMode = false;             //For single step debugging of program input
 var TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                             // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ: number = 1;
@@ -47,6 +51,7 @@ var _DrawingContext = null;             // Initialized in hostInit().
 var _DefaultFontFamily = "sans";        // Ignored, I think. The was just a place-holder in 2008, but the HTML canvas may have use for it.
 var _DefaultFontSize = 13;
 var _FontHeightMargin = 4;              // Additional space added to font size when advancing a line.
+
 
 
 var _Trace: boolean = true;  // Default the OS trace to be on.
