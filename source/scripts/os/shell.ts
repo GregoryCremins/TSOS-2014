@@ -474,7 +474,9 @@ module TSOS {
                 {
                     _Processes[0] = test;
                 }
+                _Processes[0].loadToCPU();
                 _StdOut.putText("Program validated and loaded successfully. PID = " + _Processes.length);
+                _MemoryHandler.updateMem();
             }
             else
             {
@@ -488,6 +490,7 @@ module TSOS {
             {
                 _Processes[pid - 1].loadToCPU();
                 _currentProcess = pid;
+                _CPU.isExecuting = true;
             }
            else
             {

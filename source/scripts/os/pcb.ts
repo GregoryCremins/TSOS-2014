@@ -29,7 +29,7 @@ module TSOS{
         public loadToCPU()
         {
             _CPU.load(this.PC, this.Acc, this.Xreg, this.Yreg, this.Zflag);
-            _CPU.isExecuting = true;
+
         }
 
         /**

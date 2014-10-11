@@ -444,7 +444,9 @@ var TSOS;
                 } else {
                     _Processes[0] = test;
                 }
+                _Processes[0].loadToCPU();
                 _StdOut.putText("Program validated and loaded successfully. PID = " + _Processes.length);
+                _MemoryHandler.updateMem();
             } else {
                 _StdOut.putText("Program not validated. Accepted characters: spaces, 0-9, and A-F only.");
             }
@@ -453,6 +455,7 @@ var TSOS;
             if (_Processes.length >= pid) {
                 _Processes[pid - 1].loadToCPU();
                 _currentProcess = pid;
+                _CPU.isExecuting = true;
             } else {
                 _StdOut.putText("Error: no programs loaded into memory.");
             }

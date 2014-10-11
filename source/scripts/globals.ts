@@ -13,7 +13,7 @@
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME: string    = "BEUOS";   // Beat'em up OS
-var APP_VERSION: string = "Hyper Turbo 2.9";   // The supremely heralded third edition extra editions will be be indicated.
+var APP_VERSION: string = "Hyper Turbo EX Dynamic 3.0";   // The supremely heralded third edition extra editions will be be indicated.
 //The current location for whereami
 var STAGE: number = 0;
 //the status

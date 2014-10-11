@@ -67,7 +67,8 @@ var TSOS;
         Cpu.prototype.load = function (PC, Acc, Xreg, Yreg, Zflag) {
             this.PC = PC;
             this.Acc = Acc;
-            this.Xreg = Yreg;
+            this.Xreg = Xreg;
+            this.Yreg = Yreg;
             this.Zflag = Zflag;
         };
 

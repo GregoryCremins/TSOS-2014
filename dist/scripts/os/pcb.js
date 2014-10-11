@@ -30,7 +30,6 @@ var TSOS;
         */
         PCB.prototype.loadToCPU = function () {
             _CPU.load(this.PC, this.Acc, this.Xreg, this.Yreg, this.Zflag);
-            _CPU.isExecuting = true;
         };
 
         /**
