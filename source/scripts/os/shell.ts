@@ -469,10 +469,12 @@ module TSOS {
                 if(_Processes.length == 0)
                 {
                     _Processes = _Processes.concat(test);
+                    _currentProcess = 1;
                 }
                 else
                 {
                     _Processes[0] = test;
+                    _currentProcess = 1;
                 }
                 _Processes[0].loadToCPU();
                 _StdOut.putText("Program validated and loaded successfully. PID = " + _Processes.length);

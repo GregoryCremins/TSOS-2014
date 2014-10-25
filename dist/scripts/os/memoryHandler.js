@@ -91,6 +91,10 @@ var TSOS;
                 _MemoryElement.value = _MemoryElement.value + _Memory[i] + " ";
             }
             _CPU.updateUI();
+            if (_currentProcess > 0 && _Processes[_currentProcess - 1] != null) {
+                _MemoryElement.value = _MemoryElement.value + "\n PCB. PID:" + _currentProcess + "\n";
+                _Processes[_currentProcess - 1].printToScreen();
+            }
         };
         return memory;
     })();

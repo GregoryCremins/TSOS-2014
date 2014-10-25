@@ -50,7 +50,7 @@ module TSOS {
          */
         public updateUI()
             {
-                _MemoryElement.value += "\n \n";
+                _MemoryElement.value += "\n \n CPU \n";
                 _MemoryElement.value += "PC: " + this.PC + "\n";
                 _MemoryElement.value += "Acc: " + this.Acc + "\n";
                 _MemoryElement.value += "Xreg: " + this.Xreg + "\n";
@@ -174,6 +174,7 @@ module TSOS {
                 {
                     //Break
                    this.isExecuting = false;
+                    _CPU.storeToPCB(_currentProcess);
                     _MemoryHandler.updateMem();
                     document.getElementById("btnStep").disabled = true;
                     _currentProcess = 0;
