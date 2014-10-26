@@ -85,6 +85,10 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellBSOD, "lose", "- Causes a blue screen of death image");
             this.commandList[this.commandList.length] = sc;
 
+            //clear the memory
+            sc = new TSOS.ShellCommand(this.shellClearMem, "clearmem", "-Clears all of the contents in memory");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -428,24 +432,23 @@ var TSOS;
                 }
             }
             if (isValid) {
-                //Reset memory
-                _Memory = Array.apply(null, new Array(256)).map(String.prototype.valueOf, "00");
+                var test = new TSOS.PCB();
 
+                //Handle multiple Processes
+                if (_Processes.length < 3) {
+                    _Processes = _Processes.concat(test);
+                    _currentProcess = _Processes.length;
+                } else {
+                    _Processes[2] = test;
+                    _currentProcess = 3;
+                }
+                var offset = 256 * (_Processes.length - 1);
                 for (var h = 0; h < program.length; h++) {
-                    _MemoryHandler.load(program[h], h);
+                    _MemoryHandler.load(program[h], h + offset);
                     _MemoryElement.focus();
                     _Canvas.focus();
                 }
-                var test = new TSOS.PCB();
 
-                //only handle one PCB right now
-                if (_Processes.length == 0) {
-                    _Processes = _Processes.concat(test);
-                    _currentProcess = 1;
-                } else {
-                    _Processes[0] = test;
-                    _currentProcess = 1;
-                }
                 _Processes[0].loadToCPU();
                 _StdOut.putText("Program validated and loaded successfully. PID = " + _Processes.length);
                 _MemoryHandler.updateMem();
@@ -473,6 +476,15 @@ var TSOS;
             } else {
                 _StdOut.putText("Error: no programs loaded into memory.");
             }
+        };
+
+        Shell.prototype.shellClearMem = function () {
+            for (var i = 0; i < _Memory.length; i++) {
+                _MemoryHandler.load("00", i);
+            }
+            _currentProcess = 0;
+            _Processes = new Array();
+            _StdOut.putText("Memory Cleared");
         };
         return Shell;
     })();

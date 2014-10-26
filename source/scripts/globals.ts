@@ -13,7 +13,7 @@
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME: string    = "BEUOS";   // Beat'em up OS
-var APP_VERSION: string = "Hyper Turbo EX Dynamic 3.0";   // The supremely heralded third edition extra editions will be be indicated.
+var APP_VERSION: string = "Hyper Turbo EX Dynamic 3.1";   // The supremely heralded third edition extra editions will be be indicated.
 //The current location for whereami
 var STAGE: number = 0;
 //the status
@@ -24,7 +24,7 @@ var _StatusCanvas: HTMLCanvasElement = null; //Initialized in statusBar2.0;
 var _StatusContext = null; //Initialized in statusBar2.0;
 var _StatusHandler = null; //Initialized in statusBar2.0;
 var _MemoryHandler = null; //Creates a memory handlerS
-var _Memory = Array.apply(null, new Array(256)).map(String.prototype.valueOf,"00");                       // Memory for Assembly commands
+var _Memory = Array.apply(null, new Array(768)).map(String.prototype.valueOf,"00");                       // Memory for Assembly commands
 var _MemoryElement = null;                // Memory HTML element
 var _currentProcess = 0;                  //the current running process
 var _Processes = new Array<TSOS.PCB>();                      // Array of processes
