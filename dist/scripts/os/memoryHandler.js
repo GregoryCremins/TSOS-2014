@@ -87,10 +87,21 @@ var TSOS;
         */
         memory.prototype.updateMem = function () {
             _MemoryElement.value = "";
-            for (var i = 0; i < _Memory.length; i++) {
-                _MemoryElement.value = _MemoryElement.value + _Memory[i] + " ";
+            var offset = 256 * (_currentProcess - 1);
+            if (offset < 0) {
+                offset = 0;
             }
+            for (var i = 0; i < 256; i++) {
+                _MemoryElement.value = _MemoryElement.value + _Memory[i + offset] + " ";
+            }
+
+            _MemoryElement.value = _MemoryElement.value + "\nStarting Memory Location = " + offset + "\n";
+
             _CPU.updateUI();
+            if (_currentProcess > 0 && _Processes[_currentProcess - 1] != null) {
+                _MemoryElement.value = _MemoryElement.value + "\n PCB. PID:" + _currentProcess + "\n";
+                _Processes[_currentProcess - 1].printToScreen();
+            }
         };
         return memory;
     })();

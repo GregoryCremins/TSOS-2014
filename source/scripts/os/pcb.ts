@@ -48,6 +48,16 @@ module TSOS{
             this.Yreg = Yreg;
             this.Zflag = Zflag;
         }
+
+        public printToScreen()
+        {
+            _MemoryElement.value += "\n";
+            _MemoryElement.value += "PC: " + this.PC + "\n";
+            _MemoryElement.value += "Acc: " + this.Acc + "\n";
+            _MemoryElement.value += "Xreg: " + this.Xreg + "\n";
+            _MemoryElement.value += "Yreg: " + this.Yreg + "\n";
+            _MemoryElement.value += "Zflag: " + this.Zflag + "\n";
+        }
     }
 
 

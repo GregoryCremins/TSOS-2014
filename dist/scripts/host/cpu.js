@@ -48,7 +48,7 @@ var TSOS;
         * Function to update the UI
         */
         Cpu.prototype.updateUI = function () {
-            _MemoryElement.value += "\n \n";
+            _MemoryElement.value += "\n \n CPU \n";
             _MemoryElement.value += "PC: " + this.PC + "\n";
             _MemoryElement.value += "Acc: " + this.Acc + "\n";
             _MemoryElement.value += "Xreg: " + this.Xreg + "\n";
@@ -116,6 +116,7 @@ var TSOS;
                     break;
                 }
                 case "A2": {
+                    //alert("Xregister loaded with: " + parseInt("0x" + (_MemoryHandler.read(this.PC + 1))));
                     //load constant into x register
                     this.Xreg = parseInt("0x" + (_MemoryHandler.read(this.PC + 1)));
                     this.PC = this.PC + 2;
@@ -155,31 +156,50 @@ var TSOS;
                 case "00": {
                     //Break
                     this.isExecuting = false;
+                    _CPU.storeToPCB(_currentProcess);
                     _MemoryHandler.updateMem();
                     document.getElementById("btnStep").disabled = true;
                     _currentProcess = 0;
                     break;
                 }
                 case "EC": {
+                    //  alert("TRYING TO COMPARE");
                     //Equals compare of memory to the Xreg
                     //first get memory variable
                     var oldPC = this.PC;
                     this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
-
                     var temp = parseInt("0x" + _MemoryHandler.read(this.PC));
+
+                    // alert (this.Xreg + " = " + temp );
                     if (temp == this.Xreg) {
+                        // alert("Zflag set to true!");
                         this.Zflag = 1;
+                    } else {
+                        this.Zflag = 0;
                     }
                     this.PC = oldPC + 3;
                     _MemoryHandler.updateMem();
                     break;
                 }
                 case "D0": {
+                    //  alert("Z flag is " + this.Zflag);
                     //BEQ if z flag is not set, branch
                     if (this.Zflag == 0) {
-                        this.PC = this.PC - (255 - parseInt("0x" + _MemoryHandler.read(this.PC + 1))) + 1;
+                        // alert(_MemoryHandler.read(this.PC + 1) + ": Target in mem");
+                        var offset = parseInt("0x" + _MemoryHandler.read(this.PC + 1));
+                        this.PC = this.PC + offset;
+                        if (this.PC > 255) {
+                            this.PC = this.PC - 255;
+                            //  alert("PC = " + this.PC);
+                        } else {
+                            this.PC = this.PC + 1;
+                            //    alert("PC " + this.PC);
+                            //   alert(_MemoryHandler.read(this.PC + 2));
+                        }
+                        this.PC = this.PC + 1;
                     } else {
                         this.PC = this.PC + 2;
+                        //   alert("NOT BRANCHING")
                     }
                     _MemoryHandler.updateMem();
                     break;
@@ -199,11 +219,12 @@ var TSOS;
                 case "FF": {
                     //System Call, check the Xreg
                     if (this.Xreg == 2) {
-                        _StdOut.advanceLine();
-
+                        //_StdOut.advanceLine();
                         //print the yreg to the screen
                         var i = 0;
                         while (_MemoryHandler.read(this.Yreg + i) != "00" && i < 256) {
+                            //alert("Target = " + (this.Yreg + i));
+                            //alert(_MemoryHandler.read(this.Yreg + i));
                             var charCode = (parseInt("0x" + _MemoryHandler.read(this.Yreg + i).toString()));
                             var char = String.fromCharCode(charCode);
                             _StdOut.putText(char);
@@ -211,8 +232,8 @@ var TSOS;
                         }
                     }
                     if (this.Xreg == 1) {
-                        _StdOut.advanceLine();
-                        _StdOut.putText(" " + this.Yreg);
+                        //                       //_StdOut.advanceLine();
+                        _StdOut.putText("" + this.Yreg);
                     }
                     _MemoryHandler.updateMem();
                     this.PC += 1;
