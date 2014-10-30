@@ -112,6 +112,7 @@ module TSOS {
             _Kernel.krnBootstrap();
             //update memory
             _MemoryHandler.updateMem();
+            _ReadyQueue = new TSOS.Queue();
 
         }
 

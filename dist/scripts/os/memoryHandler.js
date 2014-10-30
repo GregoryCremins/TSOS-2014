@@ -98,9 +98,11 @@ var TSOS;
             _MemoryElement.value = _MemoryElement.value + "\nStarting Memory Location = " + offset + "\n";
 
             _CPU.updateUI();
-            if (_currentProcess > 0 && _Processes[_currentProcess - 1] != null) {
-                _MemoryElement.value = _MemoryElement.value + "\n PCB. PID:" + _currentProcess + "\n";
-                _Processes[_currentProcess - 1].printToScreen();
+            if (_Processes.length > 0) {
+                for (var j = 0; j < _Processes.length; j++) {
+                    _MemoryElement.value += "\n";
+                    _Processes[j].printToScreen();
+                }
             }
         };
         return memory;

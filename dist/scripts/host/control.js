@@ -105,6 +105,7 @@ var TSOS;
 
             //update memory
             _MemoryHandler.updateMem();
+            _ReadyQueue = new TSOS.Queue();
         };
 
         Control.hostBtnHaltOS_click = function (btn) {

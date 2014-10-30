@@ -9,6 +9,7 @@ module TSOS{
         public Xreg: number = 0;
         public Yreg: number = 0;
         public Zflag: number = 0;
+        public PID: number = 0;
 
         public PCB( PC: number = 0,
                     Acc: number = 0,
@@ -21,6 +22,15 @@ module TSOS{
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
+        }
+
+        public setPID(val)
+        {
+            this.PID = val;
+        }
+        public setPCval(val)
+        {
+            this.PC = val;
         }
 
         /**
@@ -51,12 +61,14 @@ module TSOS{
 
         public printToScreen()
         {
+            _MemoryElement.value += "PCBID: " + this.PID;
             _MemoryElement.value += "\n";
-            _MemoryElement.value += "PC: " + this.PC + "\n";
-            _MemoryElement.value += "Acc: " + this.Acc + "\n";
-            _MemoryElement.value += "Xreg: " + this.Xreg + "\n";
-            _MemoryElement.value += "Yreg: " + this.Yreg + "\n";
-            _MemoryElement.value += "Zflag: " + this.Zflag + "\n";
+
+            _MemoryElement.value += "PC: " + this.PC + "|";
+            _MemoryElement.value += "Acc: " + this.Acc + "|";
+            _MemoryElement.value += "Xreg: " + this.Xreg + "|";
+            _MemoryElement.value += "Yreg: " + this.Yreg + "|";
+            _MemoryElement.value += "Zflag: " + this.Zflag + "|";
         }
     }
 

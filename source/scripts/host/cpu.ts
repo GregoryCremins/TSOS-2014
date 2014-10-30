@@ -213,7 +213,7 @@ module TSOS {
                        // alert(_MemoryHandler.read(this.PC + 1) + ": Target in mem");
                         var offset = parseInt("0x" + _MemoryHandler.read(this.PC + 1));
                         this.PC = this.PC + offset;
-                        if (this.PC > 255)
+                        if (this.PC > 255 + ((_currentProcess - 1 ) * 256))
                         {
                             this.PC = this.PC - 255;
                           //  alert("PC = " + this.PC);

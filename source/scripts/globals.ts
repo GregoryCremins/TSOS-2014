@@ -13,7 +13,7 @@
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME: string    = "BEUOS";   // Beat'em up OS
-var APP_VERSION: string = "Hyper Turbo EX Dynamic 3.1";   // The supremely heralded third edition extra editions will be be indicated.
+var APP_VERSION: string = "Hyper Turbo EX Dynamic 3.2";   // The supremely heralded third edition extra editions will be be indicated.
 //The current location for whereami
 var STAGE: number = 0;
 //the status
@@ -28,6 +28,7 @@ var _Memory = Array.apply(null, new Array(768)).map(String.prototype.valueOf,"00
 var _MemoryElement = null;                // Memory HTML element
 var _currentProcess = 0;                  //the current running process
 var _Processes = new Array<TSOS.PCB>();                      // Array of processes
+var _pidsave = 1;
 var CPU_CLOCK_INTERVAL: number = 100;   // This is in ms, or milliseconds, so 1000 = 1 second.
 var _SteppingMode = false;             //For single step debugging of program input
 var TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
@@ -61,6 +62,9 @@ var _Kernel: TSOS.Kernel;
 var _KernelInterruptQueue = null;
 var _KernelBuffers: any[] = null;
 var _KernelInputQueue = null;
+
+//OS Processes queue
+var _ReadyQueue = null;
 
 // Standard input and output
 var _StdIn  = null;
