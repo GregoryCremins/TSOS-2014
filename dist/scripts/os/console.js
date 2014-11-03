@@ -65,7 +65,7 @@ var TSOS;
                             var currentBuffer = this.buffer.toString();
                             var returnBuffer = "";
                             var foundMatch = false;
-                            var currentCommands = ["ver", "help", "shutdown", "cls", "man", "trace", "load", "rot13", "prompt", "status", "datetime", "whereami", "travel", "lose", "clearmem"];
+                            var currentCommands = ["ver", "help", "shutdown", "cls", "man", "trace", "load", "rot13", "prompt", "status", "datetime", "whereami", "travel", "lose", "clearmem", "kill"];
 
                             for (var k = 0; k < currentCommands.length; k++) {
                                 if ((this.inOrderContains(currentBuffer, currentCommands[k]))) {
@@ -167,6 +167,7 @@ var TSOS;
         };
 
         //function to check if a smaller sting is contained within the larger string
+        //because javascript no has contains method
         //stating at char 0
         Console.prototype.inOrderContains = function (smallText, largeText) {
             var isStillMatching = true;

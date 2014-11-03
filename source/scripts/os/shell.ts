@@ -113,6 +113,8 @@ module TSOS {
 
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
+            sc = new ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process ")
+            this.commandList[this.commandList.length] = sc;
 
             //
             // Display the initial prompt.
@@ -470,6 +472,7 @@ module TSOS {
                         _ReadyQueue.enqueue(targetProcess);
                     }
                 }
+                //check if it is running in the CPU
                 if (_pidsave == _currentProcess || readyFlag == true) {
                     errorFlag = 2;
                 }
@@ -505,7 +508,7 @@ module TSOS {
                     }
                     //alert("added to memory");
 
-                    _StdOut.putText("Program validated and loaded successfully. PID = " + test.PID);
+
                     _MemoryHandler.updateMem();
                 }
             }
@@ -519,7 +522,7 @@ module TSOS {
             {
                 case 0:
                 {
-                    //everything is fine
+                    _StdOut.putText("Program validated and loaded successfully. PID = " + test.PID);
 
                     break;
                 }
@@ -538,9 +541,17 @@ module TSOS {
         {
             if(_Processes.length >= pid)
             {
-                _Processes[pid - 1].loadToCPU();
-                _currentProcess = pid;
-                _CPU.isExecuting = true;
+                if(_CPU.isExecuting)
+                {
+                    _ReadyQueue.enqueue(_Processes[pid - 1]);
+                    alert("ON THE READY QUEUE");
+                }
+                else
+                {
+                    _Processes[pid - 1].loadToCPU();
+                    _currentProcess = pid;
+                    _CPU.isExecuting = true;
+                }
             }
            else
             {
@@ -572,9 +583,39 @@ module TSOS {
             }
             _currentProcess = 0;
             _Processes = new Array<TSOS.PCB>();
+            _MemoryHandler.updateMem();
             _StdOut.putText("Memory Cleared");
         }
 
+        //kill a process
+        public shellKillProcess(pid)
+        {
+            if(_currentProcess = pid)
+            {
+                _CPU.storeToPCB(_currentProcess);
+                _currentProcess = 0;
+            }
+            //check readyQueue
+            for(var i = 0; i < _ReadyQueue.getSize(); i++)
+            {
+                if(_ReadyQueue[i].PID = pid)
+                {
+                    var flag = false;
+                    var resultQueue = new TSOS.Queue();
+                   while(flag = false)
+                    {
+                        var testProcess = _ReadyQueue.dequeue();
+                        if(testProcess.PID != pid)
+                        {
+                            resultQueue.enqueue(testProcess);
+                        }
+                        flag = _ReadyQueue.getSize() <=0;
+                    }
+                    _ReadyQueue = resultQueue;
+                }
+            }
+            _MemoryHandler.updateMem();
+        }
 
     }
 }

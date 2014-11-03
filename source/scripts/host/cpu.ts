@@ -24,6 +24,7 @@ module TSOS {
                     public Xreg: number = 0,
                     public Yreg: number = 0,
                     public Zflag: number = 0,
+                    public runningCycleCount = 0,
                     public isExecuting: boolean = false) {
 
         }
@@ -39,9 +40,38 @@ module TSOS {
 
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
-            // TODO: Accumulate CPU usage and profiling statistics here.
-            // Do the real work here. Be sure to set this.isExecuting appropriately.
-            this.handleCommand(_MemoryHandler.read(this.PC));
+            //context swap
+            if((this.runningCycleCount % _quantum) == 0 && _ReadyQueue.getSize() > 0 && this.runningCycleCount > 0)
+            {
+                if(_currentProcess == 0)
+                {
+                    var process = _ReadyQueue.dequeue();
+                    process.loadToCPU();
+                    _currentProcess = process.PID;
+                    this.runningCycleCount = 0;
+                }
+                else
+                {
+                    alert(_currentProcess);
+                    //alert("CONTEXT SWAPPIN ACTION");
+                    this.contextSwitch();
+                    this.runningCycleCount = 0;
+                }
+            }
+            if(_currentProcess == 0 && _ReadyQueue.getSize() == 0)
+            {
+                this.isExecuting = false;
+            }
+            else
+            {
+
+                // TODO: Accumulate CPU usage and profiling statistics here.
+                // Do the real work here. Be sure to set this.isExecuting appropriately.
+                this.handleCommand(_MemoryHandler.read(this.PC));
+                this.runningCycleCount = this.runningCycleCount + 1;
+
+            }
+
 
         }
 
@@ -175,7 +205,7 @@ module TSOS {
                 case "00":
                 {
                     //Break
-                   this.isExecuting = false;
+                   //this.isExecuting = false;
                     _CPU.storeToPCB(_currentProcess);
                     _MemoryHandler.updateMem();
                     document.getElementById("btnStep").disabled = true;
@@ -216,12 +246,12 @@ module TSOS {
                         if (this.PC > 255 + ((_currentProcess - 1 ) * 256))
                         {
                             this.PC = this.PC - 255;
-                          //  alert("PC = " + this.PC);
+                            alert("PC = " + this.PC + " This process is: " + _currentProcess);
                         }
                         else
                         {
                             this.PC = this.PC + 1;
-                        //    alert("PC " + this.PC);
+                            alert("PC = " + this.PC + " This process is: " + _currentProcess);
                          //   alert(_MemoryHandler.read(this.PC + 2));
                         }
                         this.PC = this.PC + 1;
@@ -297,6 +327,17 @@ module TSOS {
         public storeToPCB(PID)
         {
             _Processes[PID - 1].storeVals(this.PC, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+        }
+
+        public contextSwitch()
+        {
+            //alert("Swapping contexts");
+            this.storeToPCB(_currentProcess);
+            _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
+            var nextProcess = _ReadyQueue.dequeue();
+            nextProcess.loadToCPU();
+            alert(this.PC == nextProcess.PC);
+            _currentProcess = nextProcess.PID;
         }
     }
 }

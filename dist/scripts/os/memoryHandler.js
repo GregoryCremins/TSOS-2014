@@ -104,6 +104,15 @@ var TSOS;
                     _Processes[j].printToScreen();
                 }
             }
+            _MemoryElement.value += "\nReady queue: ";
+            var resultQueue = new TSOS.Queue;
+            while (_ReadyQueue.getSize() > 0) {
+                //alert("SOMETHING IS ON HERE!");
+                var testProcess = _ReadyQueue.dequeue();
+                _MemoryElement.value += testProcess.PID + " ";
+                resultQueue.enqueue(testProcess);
+            }
+            _ReadyQueue = resultQueue;
         };
         return memory;
     })();

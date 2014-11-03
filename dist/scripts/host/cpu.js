@@ -13,18 +13,20 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 var TSOS;
 (function (TSOS) {
     var Cpu = (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, isExecuting) {
+        function Cpu(PC, Acc, Xreg, Yreg, Zflag, runningCycleCount, isExecuting) {
             if (typeof PC === "undefined") { PC = 0; }
             if (typeof Acc === "undefined") { Acc = 0; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
             if (typeof Yreg === "undefined") { Yreg = 0; }
             if (typeof Zflag === "undefined") { Zflag = 0; }
+            if (typeof runningCycleCount === "undefined") { runningCycleCount = 0; }
             if (typeof isExecuting === "undefined") { isExecuting = false; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
+            this.runningCycleCount = runningCycleCount;
             this.isExecuting = isExecuting;
         }
         Cpu.prototype.init = function () {
@@ -39,9 +41,29 @@ var TSOS;
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
 
-            // TODO: Accumulate CPU usage and profiling statistics here.
-            // Do the real work here. Be sure to set this.isExecuting appropriately.
-            this.handleCommand(_MemoryHandler.read(this.PC));
+            //context swap
+            if ((this.runningCycleCount % _quantum) == 0 && _ReadyQueue.getSize() > 0 && this.runningCycleCount > 0) {
+                if (_currentProcess == 0) {
+                    var process = _ReadyQueue.dequeue();
+                    process.loadToCPU();
+                    _currentProcess = process.PID;
+                    this.runningCycleCount = 0;
+                } else {
+                    alert(_currentProcess);
+
+                    //alert("CONTEXT SWAPPIN ACTION");
+                    this.contextSwitch();
+                    this.runningCycleCount = 0;
+                }
+            }
+            if (_currentProcess == 0 && _ReadyQueue.getSize() == 0) {
+                this.isExecuting = false;
+            } else {
+                // TODO: Accumulate CPU usage and profiling statistics here.
+                // Do the real work here. Be sure to set this.isExecuting appropriately.
+                this.handleCommand(_MemoryHandler.read(this.PC));
+                this.runningCycleCount = this.runningCycleCount + 1;
+            }
         };
 
         /**
@@ -155,7 +177,7 @@ var TSOS;
                 }
                 case "00": {
                     //Break
-                    this.isExecuting = false;
+                    //this.isExecuting = false;
                     _CPU.storeToPCB(_currentProcess);
                     _MemoryHandler.updateMem();
                     document.getElementById("btnStep").disabled = true;
@@ -190,10 +212,10 @@ var TSOS;
                         this.PC = this.PC + offset;
                         if (this.PC > 255 + ((_currentProcess - 1) * 256)) {
                             this.PC = this.PC - 255;
-                            //  alert("PC = " + this.PC);
+                            alert("PC = " + this.PC + " This process is: " + _currentProcess);
                         } else {
                             this.PC = this.PC + 1;
-                            //    alert("PC " + this.PC);
+                            alert("PC = " + this.PC + " This process is: " + _currentProcess);
                             //   alert(_MemoryHandler.read(this.PC + 2));
                         }
                         this.PC = this.PC + 1;
@@ -257,6 +279,16 @@ var TSOS;
         */
         Cpu.prototype.storeToPCB = function (PID) {
             _Processes[PID - 1].storeVals(this.PC, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+        };
+
+        Cpu.prototype.contextSwitch = function () {
+            //alert("Swapping contexts");
+            this.storeToPCB(_currentProcess);
+            _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
+            var nextProcess = _ReadyQueue.dequeue();
+            nextProcess.loadToCPU();
+            alert(this.PC == nextProcess.PC);
+            _currentProcess = nextProcess.PID;
         };
         return Cpu;
     })();

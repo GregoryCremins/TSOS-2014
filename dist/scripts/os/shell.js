@@ -91,6 +91,9 @@ var TSOS;
 
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
+            sc = new TSOS.ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process ");
+            this.commandList[this.commandList.length] = sc;
+
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -445,6 +448,8 @@ var TSOS;
                         _ReadyQueue.enqueue(targetProcess);
                     }
                 }
+
+                //check if it is running in the CPU
                 if (_pidsave == _currentProcess || readyFlag == true) {
                     errorFlag = 2;
                 } else {
@@ -478,7 +483,6 @@ var TSOS;
                     }
 
                     //alert("added to memory");
-                    _StdOut.putText("Program validated and loaded successfully. PID = " + test.PID);
                     _MemoryHandler.updateMem();
                 }
             } else {
@@ -487,6 +491,8 @@ var TSOS;
 
             switch (errorFlag) {
                 case 0: {
+                    _StdOut.putText("Program validated and loaded successfully. PID = " + test.PID);
+
                     break;
                 }
                 case 1: {
@@ -500,9 +506,14 @@ var TSOS;
         };
         Shell.prototype.shellRun = function (pid) {
             if (_Processes.length >= pid) {
-                _Processes[pid - 1].loadToCPU();
-                _currentProcess = pid;
-                _CPU.isExecuting = true;
+                if (_CPU.isExecuting) {
+                    _ReadyQueue.enqueue(_Processes[pid - 1]);
+                    alert("ON THE READY QUEUE");
+                } else {
+                    _Processes[pid - 1].loadToCPU();
+                    _currentProcess = pid;
+                    _CPU.isExecuting = true;
+                }
             } else {
                 _StdOut.putText("Error: no programs loaded into memory.");
             }
@@ -526,7 +537,32 @@ var TSOS;
             }
             _currentProcess = 0;
             _Processes = new Array();
+            _MemoryHandler.updateMem();
             _StdOut.putText("Memory Cleared");
+        };
+
+        //kill a process
+        Shell.prototype.shellKillProcess = function (pid) {
+            if (_currentProcess = pid) {
+                _CPU.storeToPCB(_currentProcess);
+                _currentProcess = 0;
+            }
+
+            for (var i = 0; i < _ReadyQueue.getSize(); i++) {
+                if (_ReadyQueue[i].PID = pid) {
+                    var flag = false;
+                    var resultQueue = new TSOS.Queue();
+                    while (flag = false) {
+                        var testProcess = _ReadyQueue.dequeue();
+                        if (testProcess.PID != pid) {
+                            resultQueue.enqueue(testProcess);
+                        }
+                        flag = _ReadyQueue.getSize() <= 0;
+                    }
+                    _ReadyQueue = resultQueue;
+                }
+            }
+            _MemoryHandler.updateMem();
         };
         return Shell;
     })();

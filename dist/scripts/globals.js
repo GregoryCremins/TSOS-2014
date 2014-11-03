@@ -10,7 +10,7 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME = "BEUOS";
-var APP_VERSION = "Hyper Turbo EX Dynamic 3.2";
+var APP_VERSION = "Hyper Turbo EX Dynamic 3.5";
 
 //The current location for whereami
 var STAGE = 0;
@@ -63,6 +63,7 @@ var _KernelInputQueue = null;
 
 //OS Processes queue
 var _ReadyQueue = null;
+var _quantum = 6;
 
 // Standard input and output
 var _StdIn = null;
