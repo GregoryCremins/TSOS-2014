@@ -13,13 +13,15 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 var TSOS;
 (function (TSOS) {
     var Cpu = (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, runningCycleCount, isExecuting) {
+        function Cpu(PC, Acc, Xreg, Yreg, Zflag, runningCycleCount, base, limit, isExecuting) {
             if (typeof PC === "undefined") { PC = 0; }
             if (typeof Acc === "undefined") { Acc = 0; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
             if (typeof Yreg === "undefined") { Yreg = 0; }
             if (typeof Zflag === "undefined") { Zflag = 0; }
             if (typeof runningCycleCount === "undefined") { runningCycleCount = 0; }
+            if (typeof base === "undefined") { base = 0; }
+            if (typeof limit === "undefined") { limit = 0; }
             if (typeof isExecuting === "undefined") { isExecuting = false; }
             this.PC = PC;
             this.Acc = Acc;
@@ -27,6 +29,8 @@ var TSOS;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
             this.runningCycleCount = runningCycleCount;
+            this.base = base;
+            this.limit = limit;
             this.isExecuting = isExecuting;
         }
         Cpu.prototype.init = function () {
@@ -39,30 +43,35 @@ var TSOS;
         };
 
         Cpu.prototype.cycle = function () {
-            _Kernel.krnTrace('CPU cycle');
-
             //context swap
             if ((this.runningCycleCount % _quantum) == 0 && _ReadyQueue.getSize() > 0 && this.runningCycleCount > 0) {
                 if (_currentProcess == 0) {
+                    _Kernel.krnTrace('Completed Program ' + _currentProcess);
                     var process = _ReadyQueue.dequeue();
                     process.loadToCPU();
                     _currentProcess = process.PID;
+                    _Kernel.krnTrace('Loading Program ' + _currentProcess);
                     this.runningCycleCount = 0;
                 } else {
-                    alert(_currentProcess);
+                    _Kernel.krnTrace('Context Swap from ' + _currentProcess);
 
+                    //alert(_currentProcess);
                     //alert("CONTEXT SWAPPIN ACTION");
                     this.contextSwitch();
                     this.runningCycleCount = 0;
                 }
-            }
-            if (_currentProcess == 0 && _ReadyQueue.getSize() == 0) {
-                this.isExecuting = false;
             } else {
-                // TODO: Accumulate CPU usage and profiling statistics here.
-                // Do the real work here. Be sure to set this.isExecuting appropriately.
-                this.handleCommand(_MemoryHandler.read(this.PC));
-                this.runningCycleCount = this.runningCycleCount + 1;
+                if (_currentProcess == 0 && _ReadyQueue.getSize() == 0) {
+                    _Kernel.krnTrace('Completed all execution');
+                    this.isExecuting = false;
+                } else {
+                    _Kernel.krnTrace('CPU cycle');
+
+                    // TODO: Accumulate CPU usage and profiling statistics here.
+                    // Do the real work here. Be sure to set this.isExecuting appropriately.
+                    this.handleCommand(_MemoryHandler.read(this.PC));
+                    this.runningCycleCount = this.runningCycleCount + 1;
+                }
             }
         };
 
@@ -86,12 +95,14 @@ var TSOS;
         * @param Yreg
         * @param Zflag
         */
-        Cpu.prototype.load = function (PC, Acc, Xreg, Yreg, Zflag) {
+        Cpu.prototype.load = function (PC, Acc, Xreg, Yreg, Zflag, base, limit) {
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
+            this.base = base;
+            this.limit = limit;
         };
 
         /**
@@ -111,21 +122,34 @@ var TSOS;
                     //load from memory
                     var oldPC = this.PC;
                     this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
-                    this.Acc = parseInt("0x" + _MemoryHandler.read(this.PC));
-                    this.PC = oldPC + 3;
-                    _MemoryHandler.updateMem();
+                    if (this.checkbounds(this.PC)) {
+                        this.Acc = parseInt("0x" + _MemoryHandler.read(this.PC));
+                        this.PC = oldPC + 3;
+                        _MemoryHandler.updateMem();
+                    } else {
+                        this.PC = oldPC;
+                        _StdOut.putText("Index out of bounds error on process " + _currentProcess);
+                        this.storeToPCB(_currentProcess);
+                        _currentProcess = 0;
+                    }
                     break;
                 }
                 case "8D": {
                     //store to memory
                     var memLoc = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
-                    if (this.Acc < 16) {
-                        _MemoryHandler.load(("0" + this.Acc), memLoc);
+                    if (this.checkbounds(memLoc)) {
+                        if (this.Acc < 16) {
+                            _MemoryHandler.load(("0" + this.Acc), memLoc);
+                        } else {
+                            _MemoryHandler.load(this.Acc, memLoc);
+                        }
+                        this.PC += 3;
+                        _MemoryHandler.updateMem();
                     } else {
-                        _MemoryHandler.load(this.Acc, memLoc);
+                        _StdOut.putText("Index out of bounds error on process " + _currentProcess);
+                        this.storeToPCB(_currentProcess);
+                        _currentProcess = 0;
                     }
-                    this.PC += 3;
-                    _MemoryHandler.updateMem();
                     break;
                 }
                 case "6D": {
@@ -149,9 +173,16 @@ var TSOS;
                     //load x register from memory
                     var oldPC = this.PC;
                     this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
-                    this.Xreg = parseInt("0x" + _Memory[this.PC]);
-                    this.PC = oldPC + 3;
-                    _MemoryHandler.updateMem();
+                    if (this.checkbounds(this.PC)) {
+                        this.Xreg = parseInt("0x" + _Memory[this.PC]);
+                        this.PC = oldPC + 3;
+                        _MemoryHandler.updateMem();
+                    } else {
+                        this.PC = oldPC;
+                        _StdOut.putText("Index out of bounds error on process " + _currentProcess);
+                        this.storeToPCB(_currentProcess);
+                        _currentProcess = 0;
+                    }
                     break;
                 }
                 case "A0": {
@@ -165,9 +196,16 @@ var TSOS;
                     //load y register from memory
                     var oldPC = this.PC;
                     this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
-                    this.Yreg = parseInt("0x" + _MemoryHandler.read(this.PC));
-                    this.PC = oldPC + 3;
-                    _MemoryHandler.updateMem();
+                    if (this.checkbounds(this.PC)) {
+                        this.Yreg = parseInt("0x" + _MemoryHandler.read(this.PC));
+                        this.PC = oldPC + 3;
+                        _MemoryHandler.updateMem();
+                    } else {
+                        this.PC = oldPC;
+                        _StdOut.putText("Index out of bounds error on process " + _currentProcess);
+                        this.storeToPCB(_currentProcess);
+                        _currentProcess = 0;
+                    }
                     break;
                 }
                 case "EA": {
@@ -185,22 +223,28 @@ var TSOS;
                     break;
                 }
                 case "EC": {
-                    //  alert("TRYING TO COMPARE");
                     //Equals compare of memory to the Xreg
                     //first get memory variable
                     var oldPC = this.PC;
                     this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
-                    var temp = parseInt("0x" + _MemoryHandler.read(this.PC));
+                    if (this.checkbounds(this.PC)) {
+                        var temp = parseInt("0x" + _MemoryHandler.read(this.PC));
 
-                    // alert (this.Xreg + " = " + temp );
-                    if (temp == this.Xreg) {
-                        // alert("Zflag set to true!");
-                        this.Zflag = 1;
+                        // alert (this.Xreg + " = " + temp );
+                        if (temp == this.Xreg) {
+                            // alert("Zflag set to true!");
+                            this.Zflag = 1;
+                        } else {
+                            this.Zflag = 0;
+                        }
+                        this.PC = oldPC + 3;
+                        _MemoryHandler.updateMem();
                     } else {
-                        this.Zflag = 0;
+                        this.PC = oldPC;
+                        _StdOut.putText("Index out of bounds error on process " + _currentProcess);
+                        this.storeToPCB(_currentProcess);
+                        _currentProcess = 0;
                     }
-                    this.PC = oldPC + 3;
-                    _MemoryHandler.updateMem();
                     break;
                 }
                 case "D0": {
@@ -212,11 +256,22 @@ var TSOS;
                         this.PC = this.PC + offset;
                         if (this.PC > 255 + ((_currentProcess - 1) * 256)) {
                             this.PC = this.PC - 255;
-                            alert("PC = " + this.PC + " This process is: " + _currentProcess);
+                            if (!this.checkbounds(this.PC)) {
+                                this.PC = this.PC + 255;
+                                _StdOut.putText("Index out of bounds error on process " + _currentProcess);
+                                this.storeToPCB(_currentProcess);
+                                _currentProcess = 0;
+                            }
+                            // alert("PC = " + this.PC + " This process is: " + _currentProcess);
                         } else {
                             this.PC = this.PC + 1;
-                            alert("PC = " + this.PC + " This process is: " + _currentProcess);
-                            //   alert(_MemoryHandler.read(this.PC + 2));
+                            if (!this.checkbounds(this.PC)) {
+                                this.PC = this.PC - 1;
+                                _StdOut.putText("Index out of bounds error on process " + _currentProcess);
+                                this.storeToPCB(_currentProcess);
+                                _currentProcess = 0;
+                            }
+                            //   alert("PC = " + this.PC + " This process is: " + _currentProcess);
                         }
                         this.PC = this.PC + 1;
                     } else {
@@ -231,11 +286,18 @@ var TSOS;
                     //first read it
                     var oldPC = this.PC;
                     this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
-                    var temp = parseInt("0x" + _MemoryHandler.read(this.PC));
-                    temp = temp + 1;
-                    _MemoryHandler.load(temp, this.PC);
-                    _MemoryHandler.updateMem();
-                    this.PC = oldPC + 3;
+                    if (this.checkbounds(this.PC)) {
+                        var temp = parseInt("0x" + _MemoryHandler.read(this.PC));
+                        temp = temp + 1;
+                        _MemoryHandler.load(temp, this.PC);
+                        _MemoryHandler.updateMem();
+                        this.PC = oldPC + 3;
+                    } else {
+                        this.PC = oldPC;
+                        _StdOut.putText("Index out of bounds error on process " + _currentProcess);
+                        this.storeToPCB(_currentProcess);
+                        _currentProcess = 0;
+                    }
                     break;
                 }
                 case "FF": {
@@ -287,8 +349,12 @@ var TSOS;
             _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
             var nextProcess = _ReadyQueue.dequeue();
             nextProcess.loadToCPU();
-            alert(this.PC == nextProcess.PC);
+
+            // alert(this.PC == nextProcess.PC);
             _currentProcess = nextProcess.PID;
+        };
+        Cpu.prototype.checkbounds = function (memLoc) {
+            return memLoc >= this.base && memLoc <= this.limit;
         };
         return Cpu;
     })();

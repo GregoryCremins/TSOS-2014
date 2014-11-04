@@ -111,7 +111,17 @@ module TSOS {
             sc = new ShellCommand(this.shellClearMem, "clearmem", "-Clears all of the contents in memory");
             this.commandList[this.commandList.length] = sc;
 
+            //set the quantum
+            sc = new ShellCommand(this.shellQuantum, "quantum", "<int> -Sets the quantum for round robin scheduling");
+            this.commandList[this.commandList.length] = sc;
+
+            //run all processes
+            sc = new ShellCommand(this.shellRunAll, "runall", "-Runs all processes in memory");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
+            sc = new ShellCommand(this.shellPS, "ps", "-Lists all running processes");
+            this.commandList[this.commandList.length] = sc;
             // kill <id> - kills the specified process id.
             sc = new ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process ")
             this.commandList[this.commandList.length] = sc;
@@ -479,7 +489,9 @@ module TSOS {
                 else {
                     var test = new PCB();
                     test.setPID(_pidsave);
-                    test.setPCval(256 * (_pidsave - 1))
+                    test.setPCval(256 * (_pidsave - 1));
+                    test.setBase(256 * (_pidsave - 1));
+                    test.setLimit(test.base + 255);
                     //alert("Test.PID = " + test.PID);
                     if (_pidsave == 3) {
                         _pidsave = 1;
@@ -544,7 +556,7 @@ module TSOS {
                 if(_CPU.isExecuting)
                 {
                     _ReadyQueue.enqueue(_Processes[pid - 1]);
-                    alert("ON THE READY QUEUE");
+                    //alert("ON THE READY QUEUE");
                 }
                 else
                 {
@@ -587,6 +599,28 @@ module TSOS {
             _StdOut.putText("Memory Cleared");
         }
 
+        //set the quantum
+        public shellQuantum(q)
+        {
+            if(q > 0)
+            {
+                if(!_CPU.isExecuting)
+                {
+                    _quantum = q;
+                    _StdOut.putText("Quantum now set to: " + _quantum);
+                }
+                else
+                {
+                    _StdOut.putText("Please wait until the CPU has completed execution before changing the quantum.");
+
+                }
+            }
+            else
+            {
+                _StdOut.putText("Invalid value for Quantum. Please use a number greater than 0");
+            }
+        }
+
         //kill a process
         public shellKillProcess(pid)
         {
@@ -615,6 +649,38 @@ module TSOS {
                 }
             }
             _MemoryHandler.updateMem();
+        }
+
+        //run all programs
+        public shellRunAll()
+        {
+            for(var i = 0; i < _Processes.length; i++)
+            {
+                _ReadyQueue.enqueue(_Processes[i]);
+            }
+            _CPU.isExecuting = true;
+            _StdOut.putText("Running all processes");
+        }
+
+        //show running proesses
+        public shellPS()
+        {
+            if(_CPU.isExecuting)
+            {
+                _StdOut.putText("Process " + _currentProcess + " in the CPU");
+                var resultQueue = new Queue();
+                while(_ReadyQueue.getSize() > 0)
+                {
+                    var pros = _ReadyQueue.dequeue();
+                    _StdOut.putText("Process " + pros.PID + " is running but waiting on the ready queue");
+                    resultQueue.enqueue(pros);
+                }
+                _ReadyQueue = resultQueue;
+            }
+            else
+            {
+                _StdOut.putText("There are no running processes.");
+            }
         }
 
     }

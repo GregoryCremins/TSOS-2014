@@ -10,6 +10,8 @@ module TSOS{
         public Yreg: number = 0;
         public Zflag: number = 0;
         public PID: number = 0;
+        public base: number = 0;
+        public limit: number = 0;
 
         public PCB( PC: number = 0,
                     Acc: number = 0,
@@ -32,13 +34,21 @@ module TSOS{
         {
             this.PC = val;
         }
+        public setLimit(val)
+        {
+            this.limit = val;
+        }
+        public setBase(val)
+        {
+            this.base = val;
+        }
 
         /**
          * Function to load the values of this PCB to the CPU
          */
         public loadToCPU()
         {
-            _CPU.load(this.PC, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+            _CPU.load(this.PC, this.Acc, this.Xreg, this.Yreg, this.Zflag, this.base, this.limit);
 
         }
 
@@ -69,6 +79,9 @@ module TSOS{
             _MemoryElement.value += "Xreg: " + this.Xreg + "|";
             _MemoryElement.value += "Yreg: " + this.Yreg + "|";
             _MemoryElement.value += "Zflag: " + this.Zflag + "|";
+            _MemoryElement.value += "Base: " + this.base + "|";
+            _MemoryElement.value += "Limit: " + this.limit + "|";
+
         }
     }
 
