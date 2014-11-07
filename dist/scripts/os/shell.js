@@ -598,6 +598,8 @@ var TSOS;
                 _ReadyQueue.enqueue(_Processes[i]);
             }
             _CPU.isExecuting = true;
+            _currentProcess = 0;
+            alert(_currentProcess);
             _StdOut.putText("Running all processes");
         };
 

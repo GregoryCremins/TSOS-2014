@@ -31,12 +31,15 @@ var TSOS;
         PCB.prototype.setPID = function (val) {
             this.PID = val;
         };
+
         PCB.prototype.setPCval = function (val) {
             this.PC = val;
         };
+
         PCB.prototype.setLimit = function (val) {
             this.limit = val;
         };
+
         PCB.prototype.setBase = function (val) {
             this.base = val;
         };
@@ -64,17 +67,29 @@ var TSOS;
             this.Zflag = Zflag;
         };
 
+        /**
+        * Function to print the PCB's contents to the screen
+        */
         PCB.prototype.printToScreen = function () {
             _MemoryElement.value += "PCBID: " + this.PID;
             _MemoryElement.value += "\n";
 
-            _MemoryElement.value += "PC: " + this.PC + "|";
-            _MemoryElement.value += "Acc: " + this.Acc + "|";
-            _MemoryElement.value += "Xreg: " + this.Xreg + "|";
-            _MemoryElement.value += "Yreg: " + this.Yreg + "|";
-            _MemoryElement.value += "Zflag: " + this.Zflag + "|";
-            _MemoryElement.value += "Base: " + this.base + "|";
-            _MemoryElement.value += "Limit: " + this.limit + "|";
+            _MemoryElement.value += "PC: 0x" + this.toHexDigit(this.PC) + "|";
+            _MemoryElement.value += "Acc: 0x" + this.toHexDigit(this.Acc) + "|";
+            _MemoryElement.value += "Xreg: 0x" + this.toHexDigit(this.Xreg) + "|";
+            _MemoryElement.value += "Yreg: 0x" + this.toHexDigit(this.Yreg) + "|";
+            _MemoryElement.value += "Zflag: 0x" + this.toHexDigit(this.Zflag) + "|";
+            _MemoryElement.value += "Base: 0x" + this.toHexDigit(this.base) + "|";
+            _MemoryElement.value += "Limit: 0x" + this.toHexDigit(this.limit) + "|";
+        };
+
+        /**
+        * Function to convert a number to hex
+        * @param dec the decimal number to be converted
+        * @returns {string} the string of the hexedecimal equivalenbt
+        */
+        PCB.prototype.toHexDigit = function (dec) {
+            return dec.toString(16);
         };
         return PCB;
     })();
