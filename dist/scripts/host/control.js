@@ -104,6 +104,7 @@ var TSOS;
             _Kernel.krnBootstrap();
 
             //update memory
+            _ReadyQueue = new TSOS.Queue();
             _MemoryHandler.updateMem();
         };
 

@@ -111,7 +111,9 @@ module TSOS {
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();
             //update memory
+            _ReadyQueue = new Queue();
             _MemoryHandler.updateMem();
+
 
         }
 

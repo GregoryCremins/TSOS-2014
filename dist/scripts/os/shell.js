@@ -89,8 +89,22 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellClearMem, "clearmem", "-Clears all of the contents in memory");
             this.commandList[this.commandList.length] = sc;
 
+            //set the quantum
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "<int> -Sets the quantum for round robin scheduling");
+            this.commandList[this.commandList.length] = sc;
+
+            //run all processes
+            sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "-Runs all processes in memory");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
+            sc = new TSOS.ShellCommand(this.shellPS, "ps", "-Lists all running processes");
+            this.commandList[this.commandList.length] = sc;
+
             // kill <id> - kills the specified process id.
+            sc = new TSOS.ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process ");
+            this.commandList[this.commandList.length] = sc;
+
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -413,6 +427,7 @@ var TSOS;
         //function to load the data from the program input into memory
         //the loading actually doesn't work, as of right now it only validates the code
         Shell.prototype.shellLoad = function () {
+            var errorFlag = 0;
             var program = _ProgramInput.value.toString().split(" ");
             var isValid = true;
 
@@ -432,35 +447,86 @@ var TSOS;
                 }
             }
             if (isValid) {
-                var test = new TSOS.PCB();
+                //check the ready queue
+                var readyFlag = false;
+                if (!_ReadyQueue.isEmpty()) {
+                    for (var k = 0; k < _ReadyQueue.getSize(); j++) {
+                        var targetProcess = _ReadyQueue.dequeue();
+                        var targetPID = targetProcess.getPID();
+                        if (_pidsave == targetPID) {
+                            readyFlag = true;
+                        }
+                        _ReadyQueue.enqueue(targetProcess);
+                    }
+                }
 
-                //Handle multiple Processes
-                if (_Processes.length < 3) {
-                    _Processes = _Processes.concat(test);
-                    _currentProcess = _Processes.length;
+                //check if it is running in the CPU
+                if (_pidsave == _currentProcess || readyFlag == true) {
+                    errorFlag = 2;
                 } else {
-                    _Processes[2] = test;
-                    _currentProcess = 3;
-                }
-                var offset = 256 * (_Processes.length - 1);
-                for (var h = 0; h < program.length; h++) {
-                    _MemoryHandler.load(program[h], h + offset);
-                    _MemoryElement.focus();
-                    _Canvas.focus();
-                }
+                    var test = new TSOS.PCB();
+                    test.setPID(_pidsave);
+                    test.setPCval(256 * (_pidsave - 1));
+                    test.setBase(256 * (_pidsave - 1));
+                    test.setLimit(test.base + 255);
 
-                _Processes[0].loadToCPU();
-                _StdOut.putText("Program validated and loaded successfully. PID = " + _Processes.length);
-                _MemoryHandler.updateMem();
+                    //alert("Test.PID = " + test.PID);
+                    if (_pidsave == 3) {
+                        _pidsave = 1;
+                    } else {
+                        _pidsave = _pidsave + 1;
+                    }
+
+                    //Handle multiple Processes
+                    if (_Processes.length < 3) {
+                        _Processes = _Processes.concat(test);
+                        _currentProcess = test.PID;
+                        //alert("Added :" + test.PID)
+                    } else {
+                        _Processes[test.PID] = test;
+                        _currentProcess = test.PID;
+                    }
+
+                    //alert(_Processes);
+                    var offset = 256 * (_Processes.length - 1);
+                    for (var h = 0; h < program.length; h++) {
+                        _MemoryHandler.load(program[h], h + offset);
+                        _MemoryElement.focus();
+                        _Canvas.focus();
+                    }
+
+                    //alert("added to memory");
+                    _MemoryHandler.updateMem();
+                }
             } else {
-                _StdOut.putText("Program not validated. Accepted characters: spaces, 0-9, and A-F only.");
+                errorFlag = 1;
+            }
+
+            switch (errorFlag) {
+                case 0: {
+                    _StdOut.putText("Program validated and loaded successfully. PID = " + test.PID);
+
+                    break;
+                }
+                case 1: {
+                    _StdOut.putText("Program not validated. Accepted characters: spaces, 0-9, and A-F only.");
+                    break;
+                }
+                case 2:
+                    _StdOut.putText("Loading target is either on ready queue or currently in CPU, to prevent errors in execution, program not loaded");
+                    break;
             }
         };
         Shell.prototype.shellRun = function (pid) {
             if (_Processes.length >= pid) {
-                _Processes[pid - 1].loadToCPU();
-                _currentProcess = pid;
-                _CPU.isExecuting = true;
+                if (_CPU.isExecuting) {
+                    _ReadyQueue.enqueue(_Processes[pid - 1]);
+                    //alert("ON THE READY QUEUE");
+                } else {
+                    _Processes[pid - 1].loadToCPU();
+                    _currentProcess = pid;
+                    _CPU.isExecuting = true;
+                }
             } else {
                 _StdOut.putText("Error: no programs loaded into memory.");
             }
@@ -484,7 +550,73 @@ var TSOS;
             }
             _currentProcess = 0;
             _Processes = new Array();
+            _MemoryHandler.updateMem();
             _StdOut.putText("Memory Cleared");
+        };
+
+        //set the quantum
+        Shell.prototype.shellQuantum = function (q) {
+            if (q > 0) {
+                if (!_CPU.isExecuting) {
+                    _quantum = q;
+                    _StdOut.putText("Quantum now set to: " + _quantum);
+                } else {
+                    _StdOut.putText("Please wait until the CPU has completed execution before changing the quantum.");
+                }
+            } else {
+                _StdOut.putText("Invalid value for Quantum. Please use a number greater than 0");
+            }
+        };
+
+        //kill a process
+        Shell.prototype.shellKillProcess = function (pid) {
+            if (_currentProcess = pid) {
+                _CPU.storeToPCB(_currentProcess);
+                _currentProcess = 0;
+            }
+
+            for (var i = 0; i < _ReadyQueue.getSize(); i++) {
+                if (_ReadyQueue[i].PID = pid) {
+                    var flag = false;
+                    var resultQueue = new TSOS.Queue();
+                    while (flag = false) {
+                        var testProcess = _ReadyQueue.dequeue();
+                        if (testProcess.PID != pid) {
+                            resultQueue.enqueue(testProcess);
+                        }
+                        flag = _ReadyQueue.getSize() <= 0;
+                    }
+                    _ReadyQueue = resultQueue;
+                }
+            }
+            _MemoryHandler.updateMem();
+        };
+
+        //run all programs
+        Shell.prototype.shellRunAll = function () {
+            for (var i = 0; i < _Processes.length; i++) {
+                _ReadyQueue.enqueue(_Processes[i]);
+            }
+            _CPU.isExecuting = true;
+            _currentProcess = 0;
+            alert(_currentProcess);
+            _StdOut.putText("Running all processes");
+        };
+
+        //show running proesses
+        Shell.prototype.shellPS = function () {
+            if (_CPU.isExecuting) {
+                _StdOut.putText("Process " + _currentProcess + " in the CPU");
+                var resultQueue = new TSOS.Queue();
+                while (_ReadyQueue.getSize() > 0) {
+                    var pros = _ReadyQueue.dequeue();
+                    _StdOut.putText("Process " + pros.PID + " is running but waiting on the ready queue");
+                    resultQueue.enqueue(pros);
+                }
+                _ReadyQueue = resultQueue;
+            } else {
+                _StdOut.putText("There are no running processes.");
+            }
         };
         return Shell;
     })();

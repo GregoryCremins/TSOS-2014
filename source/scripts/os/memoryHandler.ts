@@ -119,12 +119,25 @@ module TSOS {
                 _MemoryElement.value = _MemoryElement.value + "\nStarting Memory Location = " + offset + "\n";
 
             _CPU.updateUI();
-            if(_currentProcess > 0 && _Processes[_currentProcess - 1] != null)
+            if(_Processes.length > 0)
             {
-                _MemoryElement.value = _MemoryElement.value + "\n PCB. PID:" + _currentProcess + "\n";
-                _Processes[_currentProcess - 1].printToScreen();
-
+                //alert("UPDATING THE MEMORY CONSOLE");
+                for(var j = 0;  j < _Processes.length; j++)
+                {
+                    _MemoryElement.value += "\n";
+                    _Processes[j].printToScreen();
+                }
             }
+            _MemoryElement.value += "\nReady queue: ";
+            var resultQueue = new TSOS.Queue;
+            while(_ReadyQueue.getSize() > 0)
+            {
+                //alert("SOMETHING IS ON HERE!");
+                var testProcess = _ReadyQueue.dequeue();
+               _MemoryElement.value +=  testProcess.PID + " ";
+                resultQueue.enqueue(testProcess);
+            }
+            _ReadyQueue = resultQueue;
         }
 
 
