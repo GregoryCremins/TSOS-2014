@@ -53,7 +53,7 @@ var TSOS;
                     _Kernel.krnTrace('Loading Program ' + _currentProcess);
                     this.runningCycleCount = 0;
                 } else {
-                    alert("CONTEXTSWAP");
+                    //alert("CONTEXTSWAP");
                     _Kernel.krnTrace('Context Swap from ' + _currentProcess);
 
                     //alert(_currentProcess);
@@ -133,13 +133,14 @@ var TSOS;
                 case "AD": {
                     //load from memory
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    this.PC = (this.base) + parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+
                     if (this.checkbounds(this.PC)) {
                         this.Acc = parseInt("0x" + _MemoryHandler.read(this.PC));
                         this.PC = oldPC + 3;
                         _MemoryHandler.updateMem();
                     } else {
-                        _StdOut.putText("Index out of bounds error on process " + _currentProcess);
+                        _StdOut.putText("ERROR on AD: Index out of bounds error on process " + _currentProcess);
                         _StdOut.advanceLine();
                         _StdOut.putText("PC: " + this.PC + " is not in the memory bounds of " + this.base + " and " + this.limit);
                         _StdOut.advanceLine();
@@ -151,7 +152,7 @@ var TSOS;
                 }
                 case "8D": {
                     //store to memory
-                    var memLoc = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    var memLoc = (this.base) + parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
                     if (this.checkbounds(memLoc)) {
                         if (this.Acc < 16) {
                             _MemoryHandler.load(("0" + this.Acc), memLoc);
@@ -161,9 +162,9 @@ var TSOS;
                         this.PC += 3;
                         _MemoryHandler.updateMem();
                     } else {
-                        alert(this.base);
-                        alert(this.limit);
-                        _StdOut.putText("ERROR: Index out of bounds error on process " + _currentProcess + " PC: " + this.PC);
+                        //alert(this.base);
+                        //alert(this.limit);
+                        _StdOut.putText("ERROR on 8D: Index out of bounds error on process " + _currentProcess + " PC: " + this.PC);
                         _StdOut.advanceLine();
                         _StdOut.putText("Memory Location: " + memLoc + " is not in the memory bounds of " + this.base + " and " + this.limit);
                         _StdOut.advanceLine();
@@ -176,13 +177,13 @@ var TSOS;
                 case "6D": {
                     //add with carry
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    this.PC = (this.base) + parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
                     if (this.checkbounds(this.PC)) {
                         this.Acc += parseInt("0x" + _MemoryHandler.read(this.PC));
                         this.PC = oldPC + 3;
                         _MemoryHandler.updateMem();
                     } else {
-                        _StdOut.putText("ERROR: Index out of bounds error on process " + _currentProcess);
+                        _StdOut.putText("ERROR on 6D: Index out of bounds error on process " + _currentProcess);
                         _StdOut.advanceLine();
                         _StdOut.putText("PC: " + this.PC + " is not in the memory bounds of " + this.base + " and " + this.limit);
                         _StdOut.advanceLine();
@@ -204,7 +205,7 @@ var TSOS;
                 case "AE": {
                     //load x register from memory
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    this.PC = (this.base) + parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
                     if (this.checkbounds(this.PC)) {
                         this.Xreg = parseInt("0x" + _Memory[this.PC]);
                         this.PC = oldPC + 3;
@@ -231,7 +232,7 @@ var TSOS;
                 case "AC": {
                     //load y register from memory
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    this.PC = this.base + parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
                     if (this.checkbounds(this.PC)) {
                         this.Yreg = parseInt("0x" + _MemoryHandler.read(this.PC));
                         this.PC = oldPC + 3;
@@ -266,7 +267,7 @@ var TSOS;
                     //Equals compare of memory to the Xreg
                     //first get memory variable
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    this.PC = this.base + parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
                     if (this.checkbounds(this.PC)) {
                         var temp = parseInt("0x" + _MemoryHandler.read(this.PC));
 
@@ -280,7 +281,7 @@ var TSOS;
                         this.PC = oldPC + 3;
                         _MemoryHandler.updateMem();
                     } else {
-                        _StdOut.putText("ERROR: Index out of bounds error on process " + _currentProcess);
+                        _StdOut.putText("ERROR on EC: Index out of bounds error on process " + _currentProcess);
                         _StdOut.advanceLine();
                         _StdOut.putText("PC: " + this.PC + " is not in the memory bounds of " + this.base + " and " + this.limit);
                         _StdOut.advanceLine();
@@ -301,7 +302,7 @@ var TSOS;
                         if (this.PC > 255 + ((_currentProcess - 1) * 256)) {
                             this.PC = this.PC - 255;
                             if (!this.checkbounds(this.PC)) {
-                                _StdOut.putText("ERROR: Index out of bounds error on process " + _currentProcess);
+                                _StdOut.putText("ERROR on D0: Index out of bounds error on process " + _currentProcess);
                                 _StdOut.advanceLine();
                                 _StdOut.putText("PC: " + this.PC + " is not in the memory bounds of " + this.base + " and " + this.limit);
                                 _Kernel.krnTrace("IndexOutOfBoundsError");
@@ -314,7 +315,7 @@ var TSOS;
                         } else {
                             this.PC = this.PC + 1;
                             if (!this.checkbounds(this.PC)) {
-                                _StdOut.putText("ERROR: Index out of bounds error on process " + _currentProcess);
+                                _StdOut.putText("ERROR on D0: Index out of bounds error on process " + _currentProcess);
                                 _StdOut.advanceLine();
                                 _StdOut.putText("PC: " + this.PC + " is not in the memory bounds of " + this.base + " and " + this.limit);
                                 _StdOut.advanceLine();
@@ -337,15 +338,24 @@ var TSOS;
                     //increment the byte
                     //first read it
                     var oldPC = this.PC;
-                    this.PC = parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
+                    this.PC = this.base + parseInt("0x" + _MemoryHandler.read(this.PC + 2) + _MemoryHandler.read(this.PC + 1));
                     if (this.checkbounds(this.PC)) {
                         var temp = parseInt("0x" + _MemoryHandler.read(this.PC));
                         temp = temp + 1;
-                        _MemoryHandler.load(temp, this.PC);
-                        _MemoryHandler.updateMem();
-                        this.PC = oldPC + 3;
+                        if (temp < 256) {
+                            _MemoryHandler.load(temp, this.PC);
+                            _MemoryHandler.updateMem();
+                            this.PC = oldPC + 3;
+                        } else {
+                            _StdOut.putText("ERROR on EE: overflow error on process: " + _currentProcess);
+                            _StdOut.advanceLine();
+                            _Kernel.krnTrace("OverFlowError");
+                            this.PC = oldPC;
+                            this.storeToPCB(_currentProcess);
+                            _currentProcess = 0;
+                        }
                     } else {
-                        _StdOut.putText("ERROR: Index out of bounds error on process " + _currentProcess);
+                        _StdOut.putText("ERROR on EE: Index out of bounds error on process " + _currentProcess);
                         _StdOut.advanceLine();
                         _StdOut.putText("PC: " + this.PC + " is not in the memory bounds of " + this.base + " and " + this.limit);
                         _StdOut.advanceLine();
@@ -408,8 +418,8 @@ var TSOS;
             _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
             var nextProcess = _ReadyQueue.dequeue();
             nextProcess.loadToCPU();
-            alert(nextProcess.PID + " PC = " + this.PC);
 
+            //alert(nextProcess.PID + " PC = " + this.PC);
             // alert(this.PC == nextProcess.PC);
             _currentProcess = nextProcess.PID;
         };
