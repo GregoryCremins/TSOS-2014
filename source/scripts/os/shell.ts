@@ -503,12 +503,10 @@ module TSOS {
                     if (_Processes.length < 3) {
 
                         _Processes = _Processes.concat(test);
-                        _currentProcess = test.PID;
                         //alert("Added :" + test.PID)
                     }
                     else {
-                        _Processes[test.PID] = test;
-                        _currentProcess = test.PID;
+                        _Processes[test.PID - 1] = test;
                     }
                     //alert(_Processes);
                     var offset = 256 * (_Processes.length - 1);
@@ -624,31 +622,51 @@ module TSOS {
         //kill a process
         public shellKillProcess(pid)
         {
-            if(_currentProcess = pid)
+            var foundPID = false;
+            if(_currentProcess == pid)
             {
+                //alert("TRYING TO KILL");
+                //alert(_currentProcess);
+                //alert(_CPU.PC);
                 _CPU.storeToPCB(_currentProcess);
                 _currentProcess = 0;
+                foundPID = true;
             }
-            //check readyQueue
-            for(var i = 0; i < _ReadyQueue.getSize(); i++)
+            else
             {
-                if(_ReadyQueue[i].PID = pid)
-                {
-                    var flag = false;
-                    var resultQueue = new TSOS.Queue();
-                   while(flag = false)
-                    {
-                        var testProcess = _ReadyQueue.dequeue();
-                        if(testProcess.PID != pid)
-                        {
-                            resultQueue.enqueue(testProcess);
-                        }
-                        flag = _ReadyQueue.getSize() <=0;
+                // alert("TRYING TO REMOVE FROM QUEUE");
+                //check readyQueue
+                var flag = false;
+                var resultQueue = new TSOS.Queue();
+                while (flag == false)  {
+                    var testProcess = _ReadyQueue.dequeue();
+                    if (testProcess.PID != pid) {
+                        //alert(testProcess.PID);
+                        resultQueue.enqueue(testProcess);
+                        //alert(resultQueue.getSize());
                     }
-                    _ReadyQueue = resultQueue;
+                    else
+                    {
+                        //alert(testProcess.PID);
+                        foundPID = true;
+                        testProcess.storeToPCB(testProcess.getPID());
+                    }
+                    flag = _ReadyQueue.getSize() <= 0;
                 }
+                _ReadyQueue = resultQueue;
             }
-            _MemoryHandler.updateMem();
+            if(foundPID)
+            {
+                _StdOut.putText("Successfully killed process " + pid);
+            }
+            else
+            {
+                _StdOut.putText("Process not found. No processes killed.")
+            }
+                _StdOut.advanceLine();
+                _MemoryHandler.updateMem();
+                _Canvas.focus();
+
         }
 
         //run all programs
@@ -660,7 +678,7 @@ module TSOS {
             }
             _CPU.isExecuting = true;
             _currentProcess = 0;
-            alert(_currentProcess);
+            //alert(_currentProcess);
             _StdOut.putText("Running all processes");
         }
 
@@ -670,11 +688,13 @@ module TSOS {
             if(_CPU.isExecuting)
             {
                 _StdOut.putText("Process " + _currentProcess + " in the CPU");
+                _StdOut.advanceLine();
                 var resultQueue = new Queue();
                 while(_ReadyQueue.getSize() > 0)
                 {
                     var pros = _ReadyQueue.dequeue();
                     _StdOut.putText("Process " + pros.PID + " is running but waiting on the ready queue");
+                    _StdOut.advanceLine();
                     resultQueue.enqueue(pros);
                 }
                 _ReadyQueue = resultQueue;

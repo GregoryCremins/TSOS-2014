@@ -480,11 +480,9 @@ var TSOS;
                     //Handle multiple Processes
                     if (_Processes.length < 3) {
                         _Processes = _Processes.concat(test);
-                        _currentProcess = test.PID;
                         //alert("Added :" + test.PID)
                     } else {
-                        _Processes[test.PID] = test;
-                        _currentProcess = test.PID;
+                        _Processes[test.PID - 1] = test;
                     }
 
                     //alert(_Processes);
@@ -570,26 +568,42 @@ var TSOS;
 
         //kill a process
         Shell.prototype.shellKillProcess = function (pid) {
-            if (_currentProcess = pid) {
+            var foundPID = false;
+            if (_currentProcess == pid) {
+                //alert("TRYING TO KILL");
+                //alert(_currentProcess);
+                //alert(_CPU.PC);
                 _CPU.storeToPCB(_currentProcess);
                 _currentProcess = 0;
-            }
-
-            for (var i = 0; i < _ReadyQueue.getSize(); i++) {
-                if (_ReadyQueue[i].PID = pid) {
-                    var flag = false;
-                    var resultQueue = new TSOS.Queue();
-                    while (flag = false) {
-                        var testProcess = _ReadyQueue.dequeue();
-                        if (testProcess.PID != pid) {
-                            resultQueue.enqueue(testProcess);
-                        }
-                        flag = _ReadyQueue.getSize() <= 0;
+                foundPID = true;
+            } else {
+                // alert("TRYING TO REMOVE FROM QUEUE");
+                //check readyQueue
+                var flag = false;
+                var resultQueue = new TSOS.Queue();
+                while (flag == false) {
+                    var testProcess = _ReadyQueue.dequeue();
+                    if (testProcess.PID != pid) {
+                        //alert(testProcess.PID);
+                        resultQueue.enqueue(testProcess);
+                        //alert(resultQueue.getSize());
+                    } else {
+                        //alert(testProcess.PID);
+                        foundPID = true;
+                        testProcess.storeToPCB(testProcess.getPID());
                     }
-                    _ReadyQueue = resultQueue;
+                    flag = _ReadyQueue.getSize() <= 0;
                 }
+                _ReadyQueue = resultQueue;
             }
+            if (foundPID) {
+                _StdOut.putText("Successfully killed process " + pid);
+            } else {
+                _StdOut.putText("Process not found. No processes killed.");
+            }
+            _StdOut.advanceLine();
             _MemoryHandler.updateMem();
+            _Canvas.focus();
         };
 
         //run all programs
@@ -599,7 +613,8 @@ var TSOS;
             }
             _CPU.isExecuting = true;
             _currentProcess = 0;
-            alert(_currentProcess);
+
+            //alert(_currentProcess);
             _StdOut.putText("Running all processes");
         };
 
@@ -607,10 +622,12 @@ var TSOS;
         Shell.prototype.shellPS = function () {
             if (_CPU.isExecuting) {
                 _StdOut.putText("Process " + _currentProcess + " in the CPU");
+                _StdOut.advanceLine();
                 var resultQueue = new TSOS.Queue();
                 while (_ReadyQueue.getSize() > 0) {
                     var pros = _ReadyQueue.dequeue();
                     _StdOut.putText("Process " + pros.PID + " is running but waiting on the ready queue");
+                    _StdOut.advanceLine();
                     resultQueue.enqueue(pros);
                 }
                 _ReadyQueue = resultQueue;
