@@ -71,16 +71,48 @@ var TSOS;
         * Function to print the PCB's contents to the screen
         */
         PCB.prototype.printToScreen = function () {
-            _MemoryElement.value += "PCBID: " + this.PID;
-            _MemoryElement.value += "\n";
-
-            _MemoryElement.value += "PC: 0x" + this.toHexDigit(this.PC) + "|";
-            _MemoryElement.value += "Acc: 0x" + this.toHexDigit(this.Acc) + "|";
-            _MemoryElement.value += "Xreg: 0x" + this.toHexDigit(this.Xreg) + "|";
-            _MemoryElement.value += "Yreg: 0x" + this.toHexDigit(this.Yreg) + "|";
-            _MemoryElement.value += "Zflag: 0x" + this.toHexDigit(this.Zflag) + "|";
-            _MemoryElement.value += "Base: 0x" + this.toHexDigit(this.base) + "|";
-            _MemoryElement.value += "Limit: 0x" + this.toHexDigit(this.limit) + "|";
+            //new PCB writer
+            var newRow = _PCBElement.insertRow();
+            for (var j = 0; j < 8; j++) {
+                var targetCell = newRow.insertCell(j);
+                switch (j) {
+                    case 0: {
+                        targetCell.innerHTML = "" + this.PID;
+                        break;
+                    }
+                    case 1: {
+                        targetCell.innerHTML = "0x" + this.toHexDigit(this.PC);
+                        break;
+                    }
+                    case 2: {
+                        targetCell.innerHTML = "0x" + this.toHexDigit(this.Acc);
+                        break;
+                    }
+                    case 3: {
+                        targetCell.innerHTML = "0x" + this.toHexDigit(this.Xreg);
+                        break;
+                    }
+                    case 4: {
+                        targetCell.innerHTML = "0x" + this.toHexDigit(this.Yreg);
+                        break;
+                    }
+                    case 5: {
+                        targetCell.innerHTML = "0x" + this.toHexDigit(this.Zflag);
+                        break;
+                    }
+                    case 6: {
+                        targetCell.innerHTML = "0x" + this.toHexDigit(this.base);
+                        break;
+                    }
+                    case 7: {
+                        targetCell.innerHTML = "0x" + this.toHexDigit(this.limit);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
         };
 
         /**
