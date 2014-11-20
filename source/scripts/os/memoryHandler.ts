@@ -117,7 +117,6 @@ module TSOS {
             for (var i = 0; i < 256; i++)
             {
                 if ((i % 16) == 0) {
-                    //alert("HODOR");
                     curRow = <HTMLTableRowElement> _MemoryElement2.insertRow();
                     var indexCell = <HTMLTableCellElement> curRow.insertCell();
                     indexCell.innerHTML = "0x" + (i + offset).toString(16);
@@ -132,7 +131,6 @@ module TSOS {
                 _PCBElement.deleteRow(_PCBElement.rows.length - 1);
             }
             if (_Processes.length > 0) {
-                //alert("UPDATING THE MEMORY CONSOLE");
                 for (var j = 0; j < _Processes.length; j++) {
                     _CPUElement.value += "\n";
                     _Processes[j].printToScreen();
@@ -194,7 +192,6 @@ module TSOS {
                         }
                         default:
                         {
-                            alert("HURDUR");
                             break;
                         }
                     }

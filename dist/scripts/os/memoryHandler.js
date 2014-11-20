@@ -97,7 +97,6 @@ var TSOS;
             var curRow = null;
             for (var i = 0; i < 256; i++) {
                 if ((i % 16) == 0) {
-                    //alert("HODOR");
                     curRow = _MemoryElement2.insertRow();
                     var indexCell = curRow.insertCell();
                     indexCell.innerHTML = "0x" + (i + offset).toString(16);
@@ -162,7 +161,6 @@ var TSOS;
                             break;
                         }
                         default: {
-                            alert("HURDUR");
                             break;
                         }
                     }

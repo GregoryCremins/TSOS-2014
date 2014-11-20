@@ -109,7 +109,6 @@ var TSOS;
                         break;
                     }
                     default: {
-                        alert("HURDUR");
                         break;
                     }
                 }

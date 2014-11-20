@@ -112,7 +112,6 @@ module TSOS{
                     }
                     default:
                     {
-                        alert("HURDUR");
                         break;
                     }
                 }
