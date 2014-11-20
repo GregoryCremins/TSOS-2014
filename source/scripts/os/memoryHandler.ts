@@ -103,43 +103,107 @@ module TSOS {
         /**
          * Function to update memory on the UI
          */
-        public updateMem()
-        {
-            _MemoryElement.value = "";
-            var offset = 256 * (_currentProcess - 1);
-            if(offset < 0)
+        public updateMem() {
+            _CPUElement.value = "";
+            while(_MemoryElement2.rows.length > 0)
             {
+                _MemoryElement2.deleteRow(0);
+            }
+            var offset = 256 * (_currentProcess - 1);
+            if (offset < 0) {
                 offset = 0;
             }
-            for(var i = 0; i < 256; i++)
+            var curRow = null;
+            for (var i = 0; i < 256; i++)
             {
-                _MemoryElement.value = _MemoryElement.value + _Memory[i + offset] + " ";
+                if ((i % 16) == 0) {
+                    //alert("HODOR");
+                    curRow = <HTMLTableRowElement> _MemoryElement2.insertRow();
+                    var indexCell = <HTMLTableCellElement> curRow.insertCell();
+                    indexCell.innerHTML = "0x" + (i + offset).toString(16);
+                }
+                var targetCell2 = <HTMLTableCellElement> curRow.insertCell();
+                targetCell2.innerHTML = "" + _Memory[i + offset];
             }
 
-                _MemoryElement.value = _MemoryElement.value + "\nStarting Memory Location = " + offset + "\n";
-
             _CPU.updateUI();
-            if(_Processes.length > 0)
+            while(_PCBElement.rows.length > 1)
             {
+                _PCBElement.deleteRow(_PCBElement.rows.length - 1);
+            }
+            if (_Processes.length > 0) {
                 //alert("UPDATING THE MEMORY CONSOLE");
-                for(var j = 0;  j < _Processes.length; j++)
-                {
-                    _MemoryElement.value += "\n";
+                for (var j = 0; j < _Processes.length; j++) {
+                    _CPUElement.value += "\n";
                     _Processes[j].printToScreen();
                 }
             }
-            _MemoryElement.value += "\nReady queue: ";
-            var resultQueue = new TSOS.Queue;
-            while(_ReadyQueue.getSize() > 0)
-            {
-                //alert("SOMETHING IS ON HERE!");
-                var testProcess = _ReadyQueue.dequeue();
-               _MemoryElement.value +=  testProcess.PID + " ";
-                resultQueue.enqueue(testProcess);
-            }
-            _ReadyQueue = resultQueue;
-        }
 
+            var readyQueueTable = <HTMLTableElement> document.getElementById("readyqueue");
+            while (readyQueueTable.rows.length > 1)
+            {
+                readyQueueTable.deleteRow(readyQueueTable.rows.length - 1);
+            }
+            var resultQueue2 = new TSOS.Queue();
+            while (_ReadyQueue.getSize() > 0) {
+                var testProcess = _ReadyQueue.dequeue();
+                resultQueue2.enqueue(testProcess);
+                var row = <HTMLTableRowElement> readyQueueTable.insertRow();
+                for (var j = 0; j < 8; j++) {
+                    var targetCell = row.insertCell(j);
+                    switch (j) {
+                        case 0:
+                        {
+                            targetCell.innerHTML = "" + testProcess.PID;
+                            break;
+                        }
+                        case 1:
+                        {
+                            targetCell.innerHTML = "0x" + testProcess.toHexDigit(testProcess.PC);
+                            break;
+                        }
+                        case 2:
+                        {
+                            targetCell.innerHTML = "0x" + testProcess.toHexDigit(testProcess.Acc);
+                            break;
+                        }
+                        case 3:
+                        {
+                            targetCell.innerHTML = "0x" + testProcess.toHexDigit(testProcess.Xreg);
+                            break;
+                        }
+                        case 4:
+                        {
+                            targetCell.innerHTML = "0x" + testProcess.toHexDigit(testProcess.Yreg);
+                            break;
+                        }
+                        case 5:
+                        {
+                            targetCell.innerHTML = "0x" + testProcess.toHexDigit(testProcess.Zflag);
+                            break;
+                        }
+                        case 6:
+                        {
+                            targetCell.innerHTML = "0x" + testProcess.toHexDigit(testProcess.base);
+                            break;
+                        }
+                        case 7:
+                        {
+                            targetCell.innerHTML = "0x" + testProcess.toHexDigit(testProcess.limit);
+                            break;
+                        }
+                        default:
+                        {
+                            alert("HURDUR");
+                            break;
+                        }
+                    }
+                }
+
+            }
+            _ReadyQueue = resultQueue2;
+
+         }
 
 
     }

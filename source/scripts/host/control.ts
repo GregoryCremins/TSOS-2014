@@ -46,7 +46,9 @@ module TSOS {
 
             //create memory
             _MemoryHandler = new memory();
-            _MemoryElement = (<HTMLInputElement>document.getElementById("memory"));
+            _CPUElement = (<HTMLInputElement>document.getElementById("CPU"));
+            _MemoryElement2 = (<HTMLTableElement>document.getElementById("memory2.0"));
+            _PCBElement = (<HTMLTableElement> document.getElementById("pcbs"));
 
             // Clear the log text box.
             // Use the TypeScript cast to HTMLInputElement

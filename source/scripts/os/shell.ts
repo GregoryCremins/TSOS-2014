@@ -512,7 +512,7 @@ module TSOS {
                     var offset = 256 * (_Processes.length - 1);
                     for (var h = 0; h < program.length; h++) {
                         _MemoryHandler.load(program[h], h + offset);
-                        _MemoryElement.focus();
+                        _CPUElement.focus();
                         _Canvas.focus();
 
                     }

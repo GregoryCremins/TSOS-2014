@@ -1,4 +1,4 @@
-///<reference path="../globals.ts" />
+//<reference path="../globals.ts" />
 
 /* ------------
      CPU.ts
@@ -84,12 +84,12 @@ module TSOS {
          * Function to update the UI
          */
         public updateUI() {
-            _MemoryElement.value += "\n \n CPU \n";
-            _MemoryElement.value += "PC: 0x" + this.toHexDigit(this.PC) + "\n";
-            _MemoryElement.value += "Acc: 0x" + this.toHexDigit(this.Acc) + "\n";
-            _MemoryElement.value += "Xreg: 0x" + this.toHexDigit(this.Xreg) + "\n";
-            _MemoryElement.value += "Yreg: 0x" + this.toHexDigit(this.Yreg) + "\n";
-            _MemoryElement.value += "Zflag: 0x" + this.toHexDigit(this.Zflag) + "\n";
+            _CPUElement.value += "CPU \n";
+            _CPUElement.value += "PC: 0x" + this.toHexDigit(this.PC) + "\n";
+            _CPUElement.value += "Acc: 0x" + this.toHexDigit(this.Acc) + "\n";
+            _CPUElement.value += "Xreg: 0x" + this.toHexDigit(this.Xreg) + "\n";
+            _CPUElement.value += "Yreg: 0x" + this.toHexDigit(this.Yreg) + "\n";
+            _CPUElement.value += "Zflag: 0x" + this.toHexDigit(this.Zflag) + "\n";
         }
 
         /**
@@ -402,8 +402,8 @@ module TSOS {
 
                         //_StdOut.advanceLine();
                         //print the yreg to the screen
-                        var i = 0;
-                        while (_MemoryHandler.read(this.Yreg + i) != "00" && i < 256) {
+                        var i = this.base;
+                        while (_MemoryHandler.read(this.Yreg + i) != "00" && i < this.limit) {
                             //alert("Target = " + (this.Yreg + i));
                             //alert(_MemoryHandler.read(this.Yreg + i));
                             var charCode = (parseInt("0x" + _MemoryHandler.read(this.Yreg + i).toString()));

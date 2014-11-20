@@ -40,6 +40,16 @@
    <!-- <script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script> -->
 </head>
 
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 5px;
+    }
+</style>
+
 <body onload="onDocumentLoad();">
 
 <div id="divMain" style="width:100%;">
@@ -88,15 +98,71 @@
               tabindex="3">
       </canvas>
    </div>
+    <label>
+        Memory 2.0
+        <br>
+        <table name = "memory2.0" id = "memory2.0" tabindex = 4
+                style = "float:left;">
+        </table>
+    </label>
 <label>
-    Memory And CPU
-<br>
-   <textarea name = "memory"
-             id = "memory"
-             rows = "37"
-             cols = "49"></textarea>
+    CPU
+    <br>
+   <textarea name = "CPU"
+             id = "CPU"
+             rows = "12"
+             cols = "30"
+             tabindex = 5
+           ></textarea>
 </label>
-   <div id="divLog" style="margin-left:520px;">
+    <label>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        PCB's
+        <br>
+    <table name = "pcbs" id = "pcbs">
+        <th>Process #</th>
+        <th>PC</th>
+        <th>Acc</th>
+        <th>Xreg</th>
+        <th>Yreg</th>
+        <th>Zflag</th>
+        <th>Base Reg</th>
+        <th>Limit Reg</th>
+    </table>
+    </label>
+    <label>
+        Ready Queue
+        <br>
+        <table name = "readyqueue" id = "readyqueue" style ="float:left">
+            <tr>
+                <th>Process #</th>
+                <th>PC</th>
+                <th>Acc</th>
+                <th>Xreg</th>
+                <th>Yreg</th>
+                <th>Zflag</th>
+                <th>Base Reg</th>
+                <th>Limit Reg</th>
+            </tr>
+        </table>
+    </label>
+   <div id="divLog" style="margin-left:0px; float:left;">
       <label>
          Host Log
          <br>
@@ -109,7 +175,7 @@
       </label>
    </div>
 
-   <div id="divUserProgramInput" style="margin-left:520px;">
+   <div id="divUserProgramInput" style="margin-left:520px;  ">
       <label>
          User Program Input
          <br>
