@@ -3,10 +3,10 @@
 */
 var TSOS;
 (function (TSOS) {
-    var Harddrive = (function () {
-        function Harddrive() {
+    var hardDrive = (function () {
+        function hardDrive() {
         }
-        Harddrive.prototype.HarddriveStartup = function () {
+        hardDrive.prototype.HarddriveStartup = function () {
             for (var t = 0; t < 3; t++) {
                 for (var s = 0; s < 8; s++) {
                     for (var b = 0; b < 8; b++) {
@@ -17,14 +17,14 @@ var TSOS;
             }
         };
 
-        Harddrive.prototype.setValue = function (targettsb, value) {
-            document.getElementById(targettsb).innerHTML = value;
+        hardDrive.prototype.setValue = function (targettsb, value) {
+            localStorage.setItem(targettsb, value);
         };
 
-        Harddrive.prototype.getValue = function (targettsb) {
-            return document.getElementById(targettsb).innerHTML;
+        hardDrive.prototype.getValue = function (targettsb) {
+            return localStorage.getItem(targettsb);
         };
-        return Harddrive;
+        return hardDrive;
     })();
-    TSOS.Harddrive = Harddrive;
+    TSOS.hardDrive = hardDrive;
 })(TSOS || (TSOS = {}));

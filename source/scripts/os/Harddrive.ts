@@ -4,7 +4,7 @@
 
 module TSOS {
 
-    export class Harddrive
+    export class hardDrive
     {
         public HarddriveStartup()
         {
@@ -23,12 +23,12 @@ module TSOS {
 
         public setValue(targettsb, value)
         {
-            document.getElementById(targettsb).innerHTML = value;
+            localStorage.setItem(targettsb, value);
         }
 
         public getValue(targettsb)
         {
-            return document.getElementById(targettsb).innerHTML;
+            return localStorage.getItem(targettsb);
         }
     }
 }

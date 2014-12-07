@@ -122,10 +122,22 @@ module TSOS {
             // processes - list the running processes and their IDs
             sc = new ShellCommand(this.shellPS, "ps", "-Lists all running processes");
             this.commandList[this.commandList.length] = sc;
+
             // kill <id> - kills the specified process id.
             sc = new ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process ")
             this.commandList[this.commandList.length] = sc;
 
+            //create <filename>- creates a file in the page table
+            sc = new ShellCommand(this.shellCreateFile, "create", "<string> -Creates a file in the page table.");
+            this.commandList[this.commandList.length] = sc;
+
+            // ls - lists the files in the page table
+            sc = new ShellCommand(this.shellListDirectory, "ls", "Lists all files in memory");
+            this.commandList[this.commandList.length] = sc;
+
+            //write <filename> - read from the file if it exists
+            sc = new ShellCommand(this.shellWriteFile, "write", "<string> \"<string>\" - writes the data enclosed in quotes to the file with the given filename");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -702,6 +714,39 @@ module TSOS {
             else
             {
                 _StdOut.putText("There are no running processes.");
+            }
+        }
+        //create a file in memory
+        public shellCreateFile(fileName)
+        {
+            _HardDriveDriver.createFile(fileName);
+        }
+        public shellListDirectory()
+        {
+            _HardDriveDriver.listHardDrive();
+        }
+        public shellReadFile(fileName)
+        {
+            _HardDriveDriver.readFromFile(fileName);
+        }
+        public shellWriteFile(args)
+        {
+            if(args.length == 2)
+            {
+                var fileName = args[0];
+                var data = args[1];
+                if(data.substring(0, 1) == '"' && '"'  == data.substring(data.length - 1))
+                {
+                    _HardDriveDriver.writeToFile(fileName, data.substring(1, data.length - 1));
+                }
+                else
+                {
+                    _StdOut.putText("Please surround the data with quotes");
+                }
+            }
+            else
+            {
+                _StdOut.putText("Please provide 2 arguements, the file name and the data to be written");
             }
         }
     }

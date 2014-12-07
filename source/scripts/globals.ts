@@ -40,6 +40,9 @@ var KEYBOARD_IRQ: number = 1;
 //program input
 var _ProgramInput = null; // Initialized in hostinit
 
+//hard drive
+ var _HardDrive = new TSOS.hardDrive();
+ var _HardDriveDriver = null;
 //
 // Global Variables
 //
