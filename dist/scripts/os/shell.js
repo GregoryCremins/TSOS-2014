@@ -117,6 +117,18 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellWriteFile, "write", "<string> \"<string>\" - writes the data enclosed in quotes to the file with the given filename");
             this.commandList[this.commandList.length] = sc;
 
+            //delete <filename> -deletes a file
+            sc = new TSOS.ShellCommand(this.shellDeleteFile, "delete", "<string> - deletes the specified file from the hard drive");
+            this.commandList[this.commandList.length] = sc;
+
+            //read <filename> - read a file
+            sc = new TSOS.ShellCommand(this.shellReadFile, "read", "<string> -reads the contents of a file in memory");
+            this.commandList[this.commandList.length] = sc;
+
+            //format
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", "- Formats the hard drive");
+            this.commandList[this.commandList.length] = sc;
+
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -655,6 +667,9 @@ var TSOS;
         Shell.prototype.shellListDirectory = function () {
             _HardDriveDriver.listHardDrive();
         };
+        Shell.prototype.shellDeleteFile = function (fileName) {
+            _HardDriveDriver.deleteFile(fileName);
+        };
         Shell.prototype.shellReadFile = function (fileName) {
             _HardDriveDriver.readFromFile(fileName);
         };
@@ -670,6 +685,9 @@ var TSOS;
             } else {
                 _StdOut.putText("Please provide 2 arguements, the file name and the data to be written");
             }
+        };
+        Shell.prototype.shellFormat = function () {
+            _HardDriveDriver.formatHardDrive();
         };
         return Shell;
     })();

@@ -23,11 +23,12 @@ module TSOS
         public formatHardDrive()
         {
 
-            if(_CPU == null || !_CPU.isExecuting) {
+            if(!_CPU.isExecuting)
+            {
                 for (var t = 0; t < 3; t++) {
                     for (var s = 0; s < 8; s++) {
                         for (var b = 0; b < 8; b++) {
-                            _HardDrive.setValue(t + s + b + "", "0")
+                            _HardDrive.setValue( "" + t + s + b, "0")
                         }
                     }
 
