@@ -58,7 +58,7 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
 
             //load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "Loads the program input area value");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "Loads the program input area value, optional parameter of priority");
             this.commandList[this.commandList.length] = sc;
 
             //run
@@ -101,8 +101,12 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellPS, "ps", "-Lists all running processes");
             this.commandList[this.commandList.length] = sc;
 
+            //change the scheduling algorithm
+            sc = new TSOS.ShellCommand(this.shellSetSchedule, "setschedule", "<string> - Sets the current scheduling algorithm");
+            this.commandList[this.commandList.length] = sc;
+
             // kill <id> - kills the specified process id.
-            sc = new TSOS.ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process ");
+            sc = new TSOS.ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process");
             this.commandList[this.commandList.length] = sc;
 
             //
@@ -418,6 +422,24 @@ var TSOS;
             }
         };
 
+        //change the scheduling algorithm
+        Shell.prototype.shellSetSchedule = function (args) {
+            if (args.length > 0) {
+                var algo = args[0];
+                if (algo == "rr" || algo == "fcfs" || algo == "priority" && !_CPU.isExecuting) {
+                    _CPU.scheduling = algo;
+                    _CPU.updateUI();
+                } else {
+                    if (_CPU.isExecuting)
+                        _StdOut.putText("ERROR: Please wait for CPU to complete execution before changing the scheduling.");
+                    else
+                        _StdOut.putText("ERROR: Invalid scheduling algorithm choice.");
+                }
+            } else {
+                _StdOut.putText("Please provide an correct scheduling algorithm.");
+            }
+        };
+
         //function to cause a blue screen of death
         Shell.prototype.shellBSOD = function () {
             // Call Kernel trap
@@ -426,7 +448,11 @@ var TSOS;
 
         //function to load the data from the program input into memory
         //the loading actually doesn't work, as of right now it only validates the code
-        Shell.prototype.shellLoad = function () {
+        Shell.prototype.shellLoad = function (args) {
+            var priority = 0;
+            if (args.length > 0) {
+                priority = args[0];
+            }
             var errorFlag = 0;
             var program = _ProgramInput.value.toString().split(" ");
             var isValid = true;
@@ -469,6 +495,7 @@ var TSOS;
                     test.setPCval(256 * (_pidsave - 1));
                     test.setBase(256 * (_pidsave - 1));
                     test.setLimit(test.base + 255);
+                    test.setPriority(priority);
 
                     //alert("Test.PID = " + test.PID);
                     if (_pidsave == 3) {
@@ -519,7 +546,13 @@ var TSOS;
             if (_Processes.length >= pid) {
                 if (_CPU.isExecuting) {
                     _ReadyQueue.enqueue(_Processes[pid - 1]);
-                    //alert("ON THE READY QUEUE");
+
+                    //check if we need to sort the queue by priority
+                    if (_CPU.scheduling == "priority")
+                        ;
+                     {
+                        _ReadyQueue.sortByPriority();
+                    }
                 } else {
                     _Processes[pid - 1].loadToCPU();
                     _currentProcess = pid;
@@ -611,6 +644,7 @@ var TSOS;
             for (var i = 0; i < _Processes.length; i++) {
                 _ReadyQueue.enqueue(_Processes[i]);
             }
+            _ReadyQueue.sortByPriority();
             _CPU.isExecuting = true;
             _currentProcess = 0;
 
@@ -633,6 +667,18 @@ var TSOS;
                 _ReadyQueue = resultQueue;
             } else {
                 _StdOut.putText("There are no running processes.");
+            }
+        };
+
+        Shell.prototype.shellGetSchedule = function () {
+            if (_CPU.scheduling == "rr") {
+                _StdOut.putText("The current schedule is round robin.");
+            }
+            if (_CPU.scheduling == "priority") {
+                _StdOut.putText("The current schedule is priority.");
+            }
+            if (_CPU.scheduling == "fcfs") {
+                _StdOut.putText("The current schedule is first come first serve.");
             }
         };
         return Shell;

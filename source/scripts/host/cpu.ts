@@ -19,7 +19,7 @@ module TSOS {
 
     export class Cpu {
 
-        constructor(public PC:number = 0, public Acc:number = 0, public Xreg:number = 0, public Yreg:number = 0, public Zflag:number = 0, public runningCycleCount = 0, public base:number = 0, public limit:number = 0, public isExecuting:boolean = false) {
+        constructor(public PC:number = 0, public Acc:number = 0, public Xreg:number = 0, public Yreg:number = 0, public Zflag:number = 0, public runningCycleCount = 0, public base:number = 0, public limit:number = 0, public isExecuting:boolean = false, public scheduling = "rr") {
 
         }
 
@@ -30,11 +30,12 @@ module TSOS {
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
+            this.scheduling = "rr";
         }
 
         public cycle():void {
-            //context swap
-            if ((this.runningCycleCount % _quantum) == 0 && _ReadyQueue.getSize() > 0 && this.runningCycleCount > 0) {
+            //context swap if rr
+            if ((this.runningCycleCount % _quantum) == 0 && _ReadyQueue.getSize() > 0 && this.runningCycleCount > 0 && this.scheduling == "rr") {
                 if (_currentProcess == 0) {
                     _Kernel.krnTrace('Completed Program ' + _currentProcess);
                     var process = _ReadyQueue.dequeue();
@@ -43,7 +44,8 @@ module TSOS {
                     _Kernel.krnTrace('Loading Program ' + _currentProcess);
                     this.runningCycleCount = 0;
                 }
-                else {
+                else
+                {
                     //alert("CONTEXTSWAP");
                     _Kernel.krnTrace('Context Swap from ' + _currentProcess);
                     //alert(_currentProcess);
@@ -58,9 +60,10 @@ module TSOS {
                     this.isExecuting = false;
                 }
                 else {
+                    //otherwise check if we need to do a different context swap
                     if (_currentProcess == 0 && _ReadyQueue.getSize() != 0) {
                         _Kernel.krnTrace('Completed Program ' + _currentProcess);
-                        var process = _ReadyQueue.dequeue();
+                       var process = _ReadyQueue.dequeue();
                         process.loadToCPU();
                         _currentProcess = process.PID;
                         _Kernel.krnTrace('Loading Program ' + _currentProcess);
@@ -84,12 +87,15 @@ module TSOS {
          * Function to update the UI
          */
         public updateUI() {
+            _CPUElement.value = "";
             _CPUElement.value += "CPU \n";
             _CPUElement.value += "PC: 0x" + this.toHexDigit(this.PC) + "\n";
             _CPUElement.value += "Acc: 0x" + this.toHexDigit(this.Acc) + "\n";
             _CPUElement.value += "Xreg: 0x" + this.toHexDigit(this.Xreg) + "\n";
             _CPUElement.value += "Yreg: 0x" + this.toHexDigit(this.Yreg) + "\n";
             _CPUElement.value += "Zflag: 0x" + this.toHexDigit(this.Zflag) + "\n";
+            _CPUElement.value += "CurrentProcess: " + _currentProcess + "\n";
+            _CPUElement.value += "Scheduling: " + this.scheduling + "\n";
         }
 
         /**

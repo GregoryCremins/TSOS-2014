@@ -82,7 +82,7 @@ module TSOS {
                                     "<string> - Sets the status");
             this.commandList[this.commandList.length] = sc;
             //load
-            sc = new ShellCommand(this.shellLoad, "load", "Loads the program input area value");
+            sc = new ShellCommand(this.shellLoad, "load", "Loads the program input area value, optional parameter of priority");
             this.commandList[this.commandList.length] = sc;
             //run
             sc = new ShellCommand(this.shellRun, "run","<int> - Runs the process with the given pid");
@@ -122,9 +122,18 @@ module TSOS {
             // processes - list the running processes and their IDs
             sc = new ShellCommand(this.shellPS, "ps", "-Lists all running processes");
             this.commandList[this.commandList.length] = sc;
-            // kill <id> - kills the specified process id.
-            sc = new ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process ")
+
+            //change the scheduling algorithm
+            sc = new ShellCommand(this.shellSetSchedule,
+                "setschedule",
+                "<string> - Sets the current scheduling algorithm");
             this.commandList[this.commandList.length] = sc;
+
+            // kill <id> - kills the specified process id.
+            sc = new ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process");
+            this.commandList[this.commandList.length] = sc;
+
+
 
             //
             // Display the initial prompt.
@@ -435,6 +444,28 @@ module TSOS {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
             }
         }
+
+        //change the scheduling algorithm
+        public shellSetSchedule(args)
+        {
+            if(args.length > 0) {
+                var algo = args[0];
+                if (algo == "rr" || algo == "fcfs" || algo == "priority" && !_CPU.isExecuting) {
+                    _CPU.scheduling = algo;
+                    _CPU.updateUI();
+                }
+                else {
+                    if (_CPU.isExecuting)
+                        _StdOut.putText("ERROR: Please wait for CPU to complete execution before changing the scheduling.")
+                    else
+                        _StdOut.putText("ERROR: Invalid scheduling algorithm choice.")
+                }
+            }
+            else
+            {
+                _StdOut.putText("Please provide an correct scheduling algorithm.")
+            }
+        }
         //function to cause a blue screen of death
         public shellBSOD() {
             // Call Kernel trap
@@ -444,8 +475,13 @@ module TSOS {
 
         //function to load the data from the program input into memory
         //the loading actually doesn't work, as of right now it only validates the code
-        public shellLoad()
+        public shellLoad(args)
         {
+            var priority = 0;
+           if(args.length > 0)
+           {
+               priority = args[0];
+           }
             var errorFlag = 0;
             var program = _ProgramInput.value.toString().split(" ");
             var isValid = true;
@@ -492,6 +528,7 @@ module TSOS {
                     test.setPCval(256 * (_pidsave - 1));
                     test.setBase(256 * (_pidsave - 1));
                     test.setLimit(test.base + 255);
+                    test.setPriority(priority);
                     //alert("Test.PID = " + test.PID);
                     if (_pidsave == 3) {
                         _pidsave = 1;
@@ -554,7 +591,11 @@ module TSOS {
                 if(_CPU.isExecuting)
                 {
                     _ReadyQueue.enqueue(_Processes[pid - 1]);
-                    //alert("ON THE READY QUEUE");
+                    //check if we need to sort the queue by priority
+                    if(_CPU.scheduling == "priority");
+                    {
+                        _ReadyQueue.sortByPriority();
+                    }
                 }
                 else
                 {
@@ -676,6 +717,7 @@ module TSOS {
             {
                 _ReadyQueue.enqueue(_Processes[i]);
             }
+            _ReadyQueue.sortByPriority();
             _CPU.isExecuting = true;
             _currentProcess = 0;
             //alert(_currentProcess);
@@ -702,6 +744,22 @@ module TSOS {
             else
             {
                 _StdOut.putText("There are no running processes.");
+            }
+        }
+
+        public shellGetSchedule()
+        {
+            if(_CPU.scheduling == "rr")
+            {
+                _StdOut.putText("The current schedule is round robin.");
+            }
+            if(_CPU.scheduling == "priority")
+            {
+                _StdOut.putText("The current schedule is priority.");
+            }
+            if(_CPU.scheduling == "fcfs")
+            {
+                _StdOut.putText("The current schedule is first come first serve.");
             }
         }
     }

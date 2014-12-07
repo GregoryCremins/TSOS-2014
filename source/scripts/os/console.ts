@@ -64,7 +64,7 @@ module TSOS {
                             var currentBuffer = this.buffer.toString();
                             var returnBuffer = "";
                             var foundMatch = false;
-                            var currentCommands = ["ver","help","shutdown","cls","man","trace","load","rot13","prompt","status","datetime","whereami","travel","lose","clearmem","kill","quantum","runall","ps"];
+                            var currentCommands = ["ver","help","shutdown","cls","man","trace","load","rot13","prompt","status","datetime","whereami","travel","lose","clearmem","kill","quantum","runall","ps", "setSchedule"];
                             //there is no contains function. ARRRGH!
                             //check list of current commands
                             for(var k = 0; k < currentCommands.length; k++) {

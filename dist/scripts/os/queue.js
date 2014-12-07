@@ -39,6 +39,30 @@ var TSOS;
             }
             return retVal;
         };
+        Queue.prototype.sortByPriority = function () {
+            //redundant check
+            if (_CPU != null) {
+                var holdingArray = new TSOS.PCB[0]();
+                while (this.getSize() > 0) {
+                    holdingArray.pubh(this.dequeue());
+                }
+
+                while (holdingArray.length > 0) {
+                    var indexOfHigh = -1;
+                    var valueOfHigh = null;
+
+                    for (var i = 0; i < holdingArray.length; i++) {
+                        if (indexOfHigh == -1 || holdingArray[i].priority > valueOfHigh) {
+                            indexOfHigh = i;
+                            valueOfHigh = holdingArray[i];
+                        }
+                    }
+                    var target = holdingArray[indexOfHigh];
+                    this.enqueue(target);
+                    holdingArray.splice(indexOfHigh, 1);
+                }
+            }
+        };
         return Queue;
     })();
     TSOS.Queue = Queue;

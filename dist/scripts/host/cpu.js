@@ -13,7 +13,7 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 var TSOS;
 (function (TSOS) {
     var Cpu = (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, runningCycleCount, base, limit, isExecuting) {
+        function Cpu(PC, Acc, Xreg, Yreg, Zflag, runningCycleCount, base, limit, isExecuting, scheduling) {
             if (typeof PC === "undefined") { PC = 0; }
             if (typeof Acc === "undefined") { Acc = 0; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
@@ -23,6 +23,7 @@ var TSOS;
             if (typeof base === "undefined") { base = 0; }
             if (typeof limit === "undefined") { limit = 0; }
             if (typeof isExecuting === "undefined") { isExecuting = false; }
+            if (typeof scheduling === "undefined") { scheduling = "rr"; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -32,6 +33,7 @@ var TSOS;
             this.base = base;
             this.limit = limit;
             this.isExecuting = isExecuting;
+            this.scheduling = scheduling;
         }
         Cpu.prototype.init = function () {
             this.PC = 0;
@@ -40,11 +42,12 @@ var TSOS;
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
+            this.scheduling = "rr";
         };
 
         Cpu.prototype.cycle = function () {
-            //context swap
-            if ((this.runningCycleCount % _quantum) == 0 && _ReadyQueue.getSize() > 0 && this.runningCycleCount > 0) {
+            //context swap if rr
+            if ((this.runningCycleCount % _quantum) == 0 && _ReadyQueue.getSize() > 0 && this.runningCycleCount > 0 && this.scheduling == "rr") {
                 if (_currentProcess == 0) {
                     _Kernel.krnTrace('Completed Program ' + _currentProcess);
                     var process = _ReadyQueue.dequeue();
@@ -66,6 +69,7 @@ var TSOS;
                     _Kernel.krnTrace('Completed all execution');
                     this.isExecuting = false;
                 } else {
+                    //otherwise check if we need to do a different context swap
                     if (_currentProcess == 0 && _ReadyQueue.getSize() != 0) {
                         _Kernel.krnTrace('Completed Program ' + _currentProcess);
                         var process = _ReadyQueue.dequeue();
@@ -89,12 +93,15 @@ var TSOS;
         * Function to update the UI
         */
         Cpu.prototype.updateUI = function () {
+            _CPUElement.value = "";
             _CPUElement.value += "CPU \n";
             _CPUElement.value += "PC: 0x" + this.toHexDigit(this.PC) + "\n";
             _CPUElement.value += "Acc: 0x" + this.toHexDigit(this.Acc) + "\n";
             _CPUElement.value += "Xreg: 0x" + this.toHexDigit(this.Xreg) + "\n";
             _CPUElement.value += "Yreg: 0x" + this.toHexDigit(this.Yreg) + "\n";
             _CPUElement.value += "Zflag: 0x" + this.toHexDigit(this.Zflag) + "\n";
+            _CPUElement.value += "CurrentProcess: " + _currentProcess + "\n";
+            _CPUElement.value += "Scheduling: " + this.scheduling + "\n";
         };
 
         /**

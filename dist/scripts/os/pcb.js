@@ -14,6 +14,7 @@ var TSOS;
             this.PID = 0;
             this.base = 0;
             this.limit = 0;
+            this.priority = 0;
         }
         PCB.prototype.PCB = function (PC, Acc, Xreg, Yreg, Zflag) {
             if (typeof PC === "undefined") { PC = 0; }
@@ -26,6 +27,10 @@ var TSOS;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
+        };
+
+        PCB.prototype.getPID = function () {
+            return this.PID;
         };
 
         PCB.prototype.setPID = function (val) {
@@ -42,6 +47,9 @@ var TSOS;
 
         PCB.prototype.setBase = function (val) {
             this.base = val;
+        };
+        PCB.prototype.setPriority = function (val) {
+            this.priority = val;
         };
 
         /**
@@ -73,7 +81,7 @@ var TSOS;
         PCB.prototype.printToScreen = function () {
             //new PCB writer
             var newRow = _PCBElement.insertRow();
-            for (var j = 0; j < 8; j++) {
+            for (var j = 0; j < 9; j++) {
                 var targetCell = newRow.insertCell(j);
                 switch (j) {
                     case 0: {
@@ -106,6 +114,10 @@ var TSOS;
                     }
                     case 7: {
                         targetCell.innerHTML = "0x" + this.toHexDigit(this.limit);
+                        break;
+                    }
+                    case 8: {
+                        targetCell.innerHTML = "" + this.priority;
                         break;
                     }
                     default: {
