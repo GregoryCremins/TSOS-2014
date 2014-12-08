@@ -150,6 +150,10 @@ module TSOS {
             //format
             sc = new ShellCommand(this.shellFormat, "format", "- Formats the hard drive");
             this.commandList [this.commandList.length] = sc;
+
+            //setschedule <schedule> - set the scheduling algorithm
+            sc = new ShellCommand(this.shellSetSchedule, "setschedule", "<string> - sets the scheduling algorithm")
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -468,8 +472,12 @@ module TSOS {
 
         //function to load the data from the program input into memory
         //the loading actually doesn't work, as of right now it only validates the code
-        public shellLoad()
+        public shellLoad(priority)
         {
+            if(priority == null || priority == undefined || priority == "")
+            {
+                priority = 0;
+            }
             var errorFlag = 0;
             var program = _ProgramInput.value.toString().split(" ");
             var isValid = true;
@@ -516,6 +524,7 @@ module TSOS {
                     test.setPCval(256 * (_pidsave - 1));
                     test.setBase(256 * (_pidsave - 1));
                     test.setLimit(test.base + 255);
+                    test.setPriority(priority);
                     //alert("Test.PID = " + test.PID);
                     if (_pidsave == 3) {
                         _pidsave = 1;
@@ -578,6 +587,10 @@ module TSOS {
                 if(_CPU.isExecuting)
                 {
                     _ReadyQueue.enqueue(_Processes[pid - 1]);
+                    if(_CPU.scheduling == "priority")
+                    {
+                        _ReadyQueue.sortQueue();
+                        }
                     //alert("ON THE READY QUEUE");
                 }
                 else
@@ -700,6 +713,10 @@ module TSOS {
             {
                 _ReadyQueue.enqueue(_Processes[i]);
             }
+            if(_CPU.scheduling == "priority")
+            {
+            _ReadyQueue.sortQueue(); 
+                }
             _CPU.isExecuting = true;
             _currentProcess = 0;
             //alert(_currentProcess);
@@ -768,6 +785,25 @@ module TSOS {
         public shellFormat()
         {
             _HardDriveDriver.formatHardDrive();
+        }
+
+        public shellSetSchedule(scheduling)
+        {
+            if(!_CPU.isExecuting) {
+                if (scheduling == "priority" || scheduling == "fcfs" || scheduling == "rr") {
+                    _CPU.scheduling = scheduling;
+                    _StdOut.putText("Scheduling set");
+                    _CPU.updateUI();
+                }
+                else {
+                    _StdOut.putText("Error: Invalid scheduling chosen. Please choose either rr, priority, or fcfs");
+                }
+
+            }
+            else
+            {
+                _StdOut.putText("Please wait for CPU to finish executing before changing the scheduling")
+            }
         }
     }
 }

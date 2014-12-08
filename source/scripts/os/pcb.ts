@@ -12,6 +12,7 @@ module TSOS{
         public PID:number = 0;
         public base:number = 0;
         public limit:number = 0;
+        public priority:number = 0;
 
         public PCB(PC:number = 0, Acc:number = 0, Xreg:number = 0, Yreg:number = 0, Zflag:number = 0) {
             this.PC = PC;
@@ -35,6 +36,15 @@ module TSOS{
 
         public setBase(val) {
             this.base = val;
+        }
+        public setPriority(val)
+        {
+            this.priority = val;
+        }
+
+        public getPriority()
+        {
+            return this.priority;
         }
 
         /**
@@ -67,7 +77,7 @@ module TSOS{
         public printToScreen() {
             //new PCB writer
             var newRow = <HTMLTableRowElement>_PCBElement.insertRow();
-            for (var j = 0; j < 8; j++) {
+            for (var j = 0; j < 9; j++) {
                 var targetCell = newRow.insertCell(j);
                 switch (j) {
                     case 0:
@@ -109,6 +119,10 @@ module TSOS{
                     {
                         targetCell.innerHTML = "0x" + this.toHexDigit(this.limit);
                         break;
+                    }
+                    case 8:
+                    {
+                        targetCell.innerHTML = " " + this.priority;
                     }
                     default:
                     {

@@ -141,6 +141,7 @@ var TSOS;
                             //first, fill in the last 3 bytes with the index of the next block and the first byte set to 1 for used
                             var nextLoc = parseInt("0" + currentLoc, 8) + 1;
                             var nextLocString = nextLoc.toString(8);
+                            _HardDrive.setValue(nextLocString, "1");
                             while (nextLocString.length < 3) {
                                 nextLocString = "0" + nextLocString;
                             }
@@ -183,11 +184,11 @@ var TSOS;
                 if (+dataLocString != NaN && +dataLocString < parseInt("0277", 8)) {
                     var dataLoc = parseInt("0" + dataLocString, 8);
                     var currentData = _HardDrive.getValue(dataLoc.toString(8));
-                    var outString = "";
+                    var outString = currentData.substr(1, 61);
                     while (currentData.length == 64 && dataLoc < 255) {
-                        outString = outString + currentData.substr(1, 61);
                         currentData = _HardDrive.getValue(dataLoc.toString(8));
                         dataLoc += 1;
+                        outString = outString + currentData.substr(1, 61);
                     }
                     _StdOut.putText(outString);
                     _StdOut.advanceLine();

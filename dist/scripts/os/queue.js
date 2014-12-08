@@ -39,6 +39,29 @@ var TSOS;
             }
             return retVal;
         };
+        Queue.prototype.sortQueue = function () {
+            //first store all of the pcb's to an array
+            var temp = new Array();
+            while (this.getSize() > 0) {
+                var target = this.dequeue();
+                temp[temp.length] = target;
+            }
+
+            alert(temp.length);
+
+            while (temp.length > 0) {
+                var maxIndex = -1;
+                var maxVal = -1;
+                for (var i = 0; i < temp.length; i++) {
+                    if (temp[i].getPriority() > maxVal) {
+                        maxIndex = i;
+                        maxVal = temp[i].getPriority();
+                    }
+                }
+                this.enqueue(temp[maxIndex]);
+                temp.splice(maxIndex, 1);
+            }
+        };
         return Queue;
     })();
     TSOS.Queue = Queue;

@@ -19,7 +19,7 @@ module TSOS {
 
     export class Cpu {
 
-        constructor(public PC:number = 0, public Acc:number = 0, public Xreg:number = 0, public Yreg:number = 0, public Zflag:number = 0, public runningCycleCount = 0, public base:number = 0, public limit:number = 0, public isExecuting:boolean = false) {
+        constructor(public PC:number = 0, public Acc:number = 0, public Xreg:number = 0, public Yreg:number = 0, public Zflag:number = 0, public runningCycleCount = 0, public base:number = 0, public limit:number = 0, public isExecuting:boolean = false, public scheduling:string = "rr") {
 
         }
 
@@ -34,7 +34,7 @@ module TSOS {
 
         public cycle():void {
             //context swap
-            if ((this.runningCycleCount % _quantum) == 0 && _ReadyQueue.getSize() > 0 && this.runningCycleCount > 0) {
+            if ((this.runningCycleCount % _quantum) == 0 && _ReadyQueue.getSize() > 0 && this.runningCycleCount > 0 && this.scheduling == "rr") {
                 if (_currentProcess == 0) {
                     _Kernel.krnTrace('Completed Program ' + _currentProcess);
                     var process = _ReadyQueue.dequeue();
@@ -84,12 +84,14 @@ module TSOS {
          * Function to update the UI
          */
         public updateUI() {
+            _CPUElement.value = "";
             _CPUElement.value += "CPU \n";
             _CPUElement.value += "PC: 0x" + this.toHexDigit(this.PC) + "\n";
             _CPUElement.value += "Acc: 0x" + this.toHexDigit(this.Acc) + "\n";
             _CPUElement.value += "Xreg: 0x" + this.toHexDigit(this.Xreg) + "\n";
             _CPUElement.value += "Yreg: 0x" + this.toHexDigit(this.Yreg) + "\n";
             _CPUElement.value += "Zflag: 0x" + this.toHexDigit(this.Zflag) + "\n";
+            _CPUElement.value += "Scheduling: " + this.scheduling + "\n";
         }
 
         /**

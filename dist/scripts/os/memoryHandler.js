@@ -125,7 +125,7 @@ var TSOS;
                 var testProcess = _ReadyQueue.dequeue();
                 resultQueue2.enqueue(testProcess);
                 var row = readyQueueTable.insertRow();
-                for (var j = 0; j < 8; j++) {
+                for (var j = 0; j < 9; j++) {
                     var targetCell = row.insertCell(j);
                     switch (j) {
                         case 0: {
@@ -159,6 +159,9 @@ var TSOS;
                         case 7: {
                             targetCell.innerHTML = "0x" + testProcess.toHexDigit(testProcess.limit);
                             break;
+                        }
+                        case 8: {
+                            targetCell.innerHTML = "" + testProcess.getPriority();
                         }
                         default: {
                             break;

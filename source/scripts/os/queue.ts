@@ -18,7 +18,7 @@ module TSOS {
             return this.q.length;
         }
 
-        public isEmpty(){
+        public isEmpty() {
             return (this.q.length == 0);
         }
 
@@ -40,6 +40,34 @@ module TSOS {
                 retVal += "[" + this.q[i] + "] ";
             }
             return retVal;
+        }
+        public sortQueue()
+        {
+            //first store all of the pcb's to an array
+            var temp = new Array();
+            while(this.getSize() > 0)
+            {
+               var target = this.dequeue();
+                temp[temp.length] = target;
+            }
+
+            alert(temp.length);
+            // then put them back in order
+            while(temp.length > 0)
+            {
+                var maxIndex = -1;
+                var maxVal = -1;
+                for(var i = 0; i < temp.length; i++)
+                {
+                    if(temp[i].getPriority() > maxVal)
+                    {
+                        maxIndex = i;
+                        maxVal = temp[i].getPriority();
+                    }
+                }
+                this.enqueue(temp[maxIndex])
+                temp.splice(maxIndex, 1);
+            }
         }
     }
 }

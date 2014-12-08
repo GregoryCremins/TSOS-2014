@@ -147,7 +147,7 @@ module TSOS {
                 var testProcess = _ReadyQueue.dequeue();
                 resultQueue2.enqueue(testProcess);
                 var row = <HTMLTableRowElement> readyQueueTable.insertRow();
-                for (var j = 0; j < 8; j++) {
+                for (var j = 0; j < 9; j++) {
                     var targetCell = row.insertCell(j);
                     switch (j) {
                         case 0:
@@ -189,6 +189,10 @@ module TSOS {
                         {
                             targetCell.innerHTML = "0x" + testProcess.toHexDigit(testProcess.limit);
                             break;
+                        }
+                        case 8:
+                        {
+                            targetCell.innerHTML = "" + testProcess.getPriority();
                         }
                         default:
                         {
