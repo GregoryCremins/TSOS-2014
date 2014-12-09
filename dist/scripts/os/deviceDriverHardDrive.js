@@ -28,7 +28,8 @@ var TSOS;
                 for (var t = 0; t < 3; t++) {
                     for (var s = 0; s < 8; s++) {
                         for (var b = 0; b < 8; b++) {
-                            _HardDrive.setValue("" + t + s + b, "0");
+                            var target = "" + t + "" + s + "" + b;
+                            _HardDrive.setValue(target, "0");
                         }
                     }
                 }
@@ -45,6 +46,7 @@ var TSOS;
             while (targetLoc != "077" && target == false) {
                 if (_HardDrive.getValue(targetLoc).charAt(0) == '0') {
                     _HardDrive.setValue(targetLoc, "1" + fileName);
+                    alert("createed file " + fileName + "at location " + targetLoc);
                     target = true;
                 } else {
                     var location = parseInt("0" + targetLoc, 8);
@@ -58,6 +60,7 @@ var TSOS;
             if (target == false) {
                 _StdOut.putText("Unable to create file. Page table is full.");
             } else {
+                return targetLoc;
                 _StdOut.putText("File created in memory.");
             }
         };
@@ -69,15 +72,17 @@ var TSOS;
             var foundFile = false;
             while (pageLoc != "077" && foundFile == false) {
                 //if we found it, stop looping
+                var targetobj = _HardDrive.getValue(pageLoc);
                 var f = _HardDrive.getValue(pageLoc).indexOf(fileName);
-                if (_HardDrive.getValue(pageLoc).charAt(0) == '1' && f) {
+                alert(f);
+                if (_HardDrive.getValue(pageLoc).charAt(0) == '1' && f > -1) {
                     foundFile = true;
                 } else {
                     var location = parseInt("0" + pageLoc, 8);
                     location = location + 1;
                     pageLoc = location.toString(8);
                     while (pageLoc.length < 3) {
-                        pageLoc = "0" + targetLoc;
+                        pageLoc = "0" + pageLoc;
                     }
                 }
             }
@@ -88,7 +93,6 @@ var TSOS;
                 var targetLoc = "100";
                 var target = false;
                 var numBlocks = Math.ceil(data.length / 60);
-
                 var runningCountOfBlocks = 0;
                 var flag = false;
 
@@ -126,6 +130,7 @@ var TSOS;
                     while (currentLoc.length < 3) {
                         currentLoc = "0" + currentLoc;
                     }
+                    alert("Write to:" + currentLoc);
 
                     //then we begin the write.
                     var counter = 0;
@@ -153,10 +158,10 @@ var TSOS;
                     }
                     _StdOut.putText("Data successfully written to memory");
                 } else {
-                    _StdOut.putText("Error: No large enough space exists for data. Try clearing some files and try again.");
+                    _StdOut.putText("Write Error: No large enough space exists for data. Try clearing some files and try again.");
                 }
             } else {
-                _StdOut.putText("Error: File not found. Please make sure the name is correct.");
+                _StdOut.putText("Write Error: File not found. Please make sure the name is correct.");
             }
         };
 
@@ -173,6 +178,9 @@ var TSOS;
                     var location = parseInt("0" + pageLoc, 8);
                     location = location + 1;
                     pageLoc = location.toString(8);
+                    while (pageLoc.length < 3) {
+                        pageLoc = "0" + pageLoc;
+                    }
                 }
             }
 
@@ -190,8 +198,7 @@ var TSOS;
                         dataLoc += 1;
                         outString = outString + currentData.substr(1, 61);
                     }
-                    _StdOut.putText(outString);
-                    _StdOut.advanceLine();
+                    return outString;
                 } else {
                     _StdOut.putText("File exists, but there is no data");
                 }
@@ -213,6 +220,9 @@ var TSOS;
                     var location = parseInt("0" + pageLoc, 8);
                     location = location + 1;
                     pageLoc = location.toString(8);
+                    while (pageLoc.length < 3) {
+                        pageLoc = "0" + pageLoc;
+                    }
                 }
             }
 
@@ -231,10 +241,11 @@ var TSOS;
                         _HardDrive.setValue(dataLoc.toString(8), "0");
                         dataLoc += 1;
                     }
-                    _StdOut.putText("Successfully deleted file");
+                    return true;
                 }
             } else {
-                _StdOut.putText("Error: file not found");
+                alert("Delete error: File not found");
+                return false;
             }
         };
 

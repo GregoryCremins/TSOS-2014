@@ -13,6 +13,7 @@ var TSOS;
 
         //loads an item into memory
         memory.prototype.load = function (mem, index) {
+            //alert(mem);
             if (typeof (mem) == typeof (123)) {
                 //it is a hex digit, we need to do conversion
                 var first = 0;
@@ -28,6 +29,10 @@ var TSOS;
                 _Memory[index] = firstChar + secondChar;
                 this.updateMem();
             } else {
+                if (mem == undefined) {
+                    mem = "00";
+                }
+
                 //otherwise, its already disassembly
                 _Memory[index] = mem;
                 this.updateMem();
@@ -125,7 +130,7 @@ var TSOS;
                 var testProcess = _ReadyQueue.dequeue();
                 resultQueue2.enqueue(testProcess);
                 var row = readyQueueTable.insertRow();
-                for (var j = 0; j < 9; j++) {
+                for (var j = 0; j < 10; j++) {
                     var targetCell = row.insertCell(j);
                     switch (j) {
                         case 0: {
@@ -162,6 +167,11 @@ var TSOS;
                         }
                         case 8: {
                             targetCell.innerHTML = "" + testProcess.getPriority();
+                            break;
+                        }
+                        case 9: {
+                            targetCell.innerHTML = testProcess.getHardDriveLoc();
+                            break;
                         }
                         default: {
                             break;

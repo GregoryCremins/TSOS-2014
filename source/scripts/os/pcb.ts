@@ -13,6 +13,7 @@ module TSOS{
         public base:number = 0;
         public limit:number = 0;
         public priority:number = 0;
+        public hardDriveLoc:string = "N/A";
 
         public PCB(PC:number = 0, Acc:number = 0, Xreg:number = 0, Yreg:number = 0, Zflag:number = 0) {
             this.PC = PC;
@@ -46,6 +47,14 @@ module TSOS{
         {
             return this.priority;
         }
+        public setHardDriveLoc(loc)
+        {
+            this.hardDriveLoc = loc;
+        }
+        public getHardDriveLoc()
+        {
+            return this.hardDriveLoc;
+        }
 
         /**
          * Function to load the values of this PCB to the CPU
@@ -77,7 +86,7 @@ module TSOS{
         public printToScreen() {
             //new PCB writer
             var newRow = <HTMLTableRowElement>_PCBElement.insertRow();
-            for (var j = 0; j < 9; j++) {
+            for (var j = 0; j < 10; j++) {
                 var targetCell = newRow.insertCell(j);
                 switch (j) {
                     case 0:
@@ -123,6 +132,12 @@ module TSOS{
                     case 8:
                     {
                         targetCell.innerHTML = " " + this.priority;
+                        break;
+                    }
+                    case 9:
+                    {
+                        targetCell.innerHTML = this.hardDriveLoc;
+                        break;
                     }
                     default:
                     {

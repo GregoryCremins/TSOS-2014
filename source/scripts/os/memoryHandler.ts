@@ -15,6 +15,7 @@ module TSOS {
         //loads an item into memory
         public load(mem, index)
         {
+            //alert(mem);
             if(typeof(mem) == typeof(123))
             {
                 //it is a hex digit, we need to do conversion
@@ -35,6 +36,10 @@ module TSOS {
             }
             else
             {
+                if(mem == undefined)
+                {
+                    mem = "00"
+                }
                 //otherwise, its already disassembly
                 _Memory[index] = mem;
                 this.updateMem();
@@ -147,7 +152,7 @@ module TSOS {
                 var testProcess = _ReadyQueue.dequeue();
                 resultQueue2.enqueue(testProcess);
                 var row = <HTMLTableRowElement> readyQueueTable.insertRow();
-                for (var j = 0; j < 9; j++) {
+                for (var j = 0; j <10; j++) {
                     var targetCell = row.insertCell(j);
                     switch (j) {
                         case 0:
@@ -193,6 +198,12 @@ module TSOS {
                         case 8:
                         {
                             targetCell.innerHTML = "" + testProcess.getPriority();
+                            break;
+                        }
+                        case 9:
+                        {
+                            targetCell.innerHTML = testProcess.getHardDriveLoc();
+                            break;
                         }
                         default:
                         {

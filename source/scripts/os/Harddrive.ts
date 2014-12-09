@@ -14,7 +14,7 @@ module TSOS {
                 {
                     for(var b = 0; b < 8; b++)
                     {
-                        var memString = "" + t + s + b;
+                        var memString = "" + t + "" + s + "" + b;
                         localStorage.setItem(memString, "0");
                     }
                 }

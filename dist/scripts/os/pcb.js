@@ -15,6 +15,7 @@ var TSOS;
             this.base = 0;
             this.limit = 0;
             this.priority = 0;
+            this.hardDriveLoc = "N/A";
         }
         PCB.prototype.PCB = function (PC, Acc, Xreg, Yreg, Zflag) {
             if (typeof PC === "undefined") { PC = 0; }
@@ -51,6 +52,12 @@ var TSOS;
         PCB.prototype.getPriority = function () {
             return this.priority;
         };
+        PCB.prototype.setHardDriveLoc = function (loc) {
+            this.hardDriveLoc = loc;
+        };
+        PCB.prototype.getHardDriveLoc = function () {
+            return this.hardDriveLoc;
+        };
 
         /**
         * Function to load the values of this PCB to the CPU
@@ -81,7 +88,7 @@ var TSOS;
         PCB.prototype.printToScreen = function () {
             //new PCB writer
             var newRow = _PCBElement.insertRow();
-            for (var j = 0; j < 9; j++) {
+            for (var j = 0; j < 10; j++) {
                 var targetCell = newRow.insertCell(j);
                 switch (j) {
                     case 0: {
@@ -118,6 +125,11 @@ var TSOS;
                     }
                     case 8: {
                         targetCell.innerHTML = " " + this.priority;
+                        break;
+                    }
+                    case 9: {
+                        targetCell.innerHTML = this.hardDriveLoc;
+                        break;
                     }
                     default: {
                         break;

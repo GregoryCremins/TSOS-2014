@@ -38,7 +38,14 @@ module TSOS {
                 if (_currentProcess == 0) {
                     _Kernel.krnTrace('Completed Program ' + _currentProcess);
                     var process = _ReadyQueue.dequeue();
-                    process.loadToCPU();
+                    if(process.getHardDriveLoc() != "N/A")
+                    {
+                        this.rollIn(process);
+                    }
+                    else
+                    {
+                        process.loadToCPU();
+                    }
                     _currentProcess = process.PID;
                     _Kernel.krnTrace('Loading Program ' + _currentProcess);
                     this.runningCycleCount = 0;
@@ -61,7 +68,13 @@ module TSOS {
                     if (_currentProcess == 0 && _ReadyQueue.getSize() != 0) {
                         _Kernel.krnTrace('Completed Program ' + _currentProcess);
                         var process = _ReadyQueue.dequeue();
-                        process.loadToCPU();
+                        if(process.getHardDriveLoc() != "N/A")
+                        {
+                            this.rollIn(process);
+                        }
+                        else {
+                            process.loadToCPU();
+                        }
                         _currentProcess = process.PID;
                         _Kernel.krnTrace('Loading Program ' + _currentProcess);
                         this.runningCycleCount = 0;
@@ -450,9 +463,17 @@ module TSOS {
         public contextSwitch() {
             //alert("Swapping contexts");
             this.storeToPCB(_currentProcess);
-            _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
             var nextProcess = _ReadyQueue.dequeue();
-            nextProcess.loadToCPU();
+            if(nextProcess.getHardDriveLoc() == "N/A")
+            {
+                _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
+                nextProcess.loadToCPU();
+            }
+            else
+            {
+                this.rollIn(nextProcess);
+            }
+
             //alert(nextProcess.PID + " PC = " + this.PC);
             // alert(this.PC == nextProcess.PC);
             _currentProcess = nextProcess.PID;
@@ -476,6 +497,48 @@ module TSOS {
             return dec.toString(16);
         }
 
+        public rollOut()
+        {
+            var targetFile = "Process" + _currentProcess;
+            alert("name of file =" + targetFile);
+            var buffer = "";
+            for(var i = this.base; i < this.limit; i++)
+            {
+                buffer = buffer + this.toHexDigit(_MemoryHandler.read(i));
+            }
+            var found = _HardDriveDriver.deleteFile(targetFile);
+            var holder = _HardDriveDriver.createFile(targetFile);
+            _Processes[_currentProcess - 1].setHardDriveLoc(holder);
+            _HardDriveDriver.writeToFile(targetFile, buffer);
+            _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
+            return _Processes[_currentProcess - 1].base;
+            //alert(nextProcess.PID + " PC = " + this.PC);
+            // alert(this.PC == nextProcess.PC);
+        }
+        public rollIn(process)
+        {
+            var fileName = "Process" + process.PID;
+            var buffer = "" + _HardDriveDriver.readFromFile(fileName);
+            //alert(nextProcess.PID + " PC = " + this.PC);
+            // alert(this.PC == nextProcess.PC);
+            var temp = this.rollOut();
+            process.loadToCPU();
+            _currentProcess = process.PID;
+            _HardDriveDriver.deleteFile(fileName);
+            alert("base" + temp);
+            for(var i = process.base; i < process.limit; i++)
+            {
+                alert("HALP" + i);
+                alert(buffer.substring(0,2));
+                _MemoryHandler.load(buffer.substring(0,2), i);
+                alert("value = " +_MemoryHandler.read(i));
+                buffer = buffer.substring(2,buffer.length);
+
+            }
+            _MemoryHandler.updateMem();
+            alert("finito");
+            process.setHardDriveLoc("N/A");
+        }
 
     }
 }

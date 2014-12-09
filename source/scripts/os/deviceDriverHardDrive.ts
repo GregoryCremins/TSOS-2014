@@ -27,8 +27,10 @@ module TSOS
             {
                 for (var t = 0; t < 3; t++) {
                     for (var s = 0; s < 8; s++) {
-                        for (var b = 0; b < 8; b++) {
-                            _HardDrive.setValue( "" + t + s + b, "0")
+                        for (var b = 0; b < 8; b++)
+                        {
+                            var target = "" + t + "" + s + "" + b;
+                            _HardDrive.setValue( target, "0")
                         }
                     }
 
@@ -50,6 +52,7 @@ module TSOS
                if(_HardDrive.getValue(targetLoc).charAt(0) == '0')
                 {
                     _HardDrive.setValue(targetLoc, "1" + fileName);
+                    alert("createed file " + fileName + "at location " + targetLoc);
                     target = true;
                 }
                else
@@ -62,6 +65,7 @@ module TSOS
                        targetLoc = "0" + targetLoc;
                    }
                }
+
             }
             if(target == false)
             {
@@ -69,6 +73,7 @@ module TSOS
             }
             else
             {
+                return targetLoc;
                 _StdOut.putText("File created in memory.");
             }
         }
@@ -82,9 +87,9 @@ module TSOS
             while(pageLoc != "077" && foundFile == false)
             {
                 //if we found it, stop looping
-
+                var targetobj = _HardDrive.getValue(pageLoc);
                 var f = _HardDrive.getValue(pageLoc).indexOf(fileName);
-                if(_HardDrive.getValue(pageLoc).charAt(0) == '1' && f)
+                if(_HardDrive.getValue(pageLoc).charAt(0) == '1' && f > -1)
                 {
                     foundFile = true;
                 }
@@ -95,7 +100,7 @@ module TSOS
                 pageLoc = location.toString(8);
                     while(pageLoc.length < 3)
                     {
-                        pageLoc = "0" + targetLoc;
+                        pageLoc = "0" + pageLoc;
                     }
                 }
             }
@@ -106,7 +111,6 @@ module TSOS
                 var targetLoc = "100"
                 var target = false;
                 var numBlocks = Math.ceil(data.length / 60);
-
                 var runningCountOfBlocks = 0;
                 var flag = false;
                 //first find a space in memory which will fit the data
@@ -149,6 +153,7 @@ module TSOS
                     {
                         currentLoc = "0" + currentLoc;
                     }
+                    alert("Write to:" + currentLoc);
                     //then we begin the write.
                     var counter = 0;
                     _HardDrive.setValue(currentLoc, 1)
@@ -158,7 +163,8 @@ module TSOS
                         data = data.substring(1);
                         counter++;
                         //then if we need to swap blocks. we do so
-                        if (counter % 60 == 0) {
+                        if (counter % 60 == 0)
+                        {
                             //first, fill in the last 3 bytes with the index of the next block and the first byte set to 1 for used
                             var nextLoc = parseInt("0" + currentLoc, 8) + 1;
                             var nextLocString = nextLoc.toString(8);
@@ -177,13 +183,13 @@ module TSOS
                 //if we did not find a large enough space to put the data, throw error
                 else
                 {
-                    _StdOut.putText("Error: No large enough space exists for data. Try clearing some files and try again.")
+                    _StdOut.putText("Write Error: No large enough space exists for data. Try clearing some files and try again.")
                 }
             }
             //otherwise we did not find the file
             else
             {
-                _StdOut.putText("Error: File not found. Please make sure the name is correct.")
+                _StdOut.putText("Write Error: File not found. Please make sure the name is correct.")
             }
 
         }
@@ -205,6 +211,10 @@ module TSOS
                     var location = parseInt("0" + pageLoc, 8);
                     location = location + 1;
                     pageLoc = location.toString(8);
+                    while(pageLoc.length < 3)
+                    {
+                        pageLoc = "0" + pageLoc;
+                    }
                 }
             }
             //if we found it, we need to print it
@@ -223,8 +233,7 @@ module TSOS
                         dataLoc += 1;
                         outString = outString + currentData.substr(1, 61);
                     }
-                    _StdOut.putText(outString);
-                    _StdOut.advanceLine();
+                    return outString;
                 }
                 else
                 {
@@ -255,6 +264,10 @@ module TSOS
                     var location = parseInt("0" + pageLoc, 8);
                     location = location + 1;
                     pageLoc = location.toString(8);
+                    while(pageLoc.length < 3)
+                    {
+                        pageLoc = "0" + pageLoc;
+                    }
                 }
             }
             //if we found it, we need to remove it
@@ -273,12 +286,13 @@ module TSOS
                         _HardDrive.setValue(dataLoc.toString(8), "0");
                         dataLoc += 1;
                     }
-                    _StdOut.putText("Successfully deleted file");
+                   return true;
                 }
             }
             else
             {
-                _StdOut.putText("Error: file not found");
+                alert("Delete error: File not found");
+                return false;
             }
         }
 

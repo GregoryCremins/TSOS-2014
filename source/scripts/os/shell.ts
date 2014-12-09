@@ -521,12 +521,17 @@ module TSOS {
                 else {
                     var test = new PCB();
                     test.setPID(_pidsave);
-                    test.setPCval(256 * (_pidsave - 1));
-                    test.setBase(256 * (_pidsave - 1));
+                    var thing = _pidsave;
+                    if(_pidsave > 3)
+                    {
+                        thing = (_pidsave % 3)
+                    }
+                    test.setPCval(256 * (thing - 1));
+                    test.setBase(256 * (thing - 1));
                     test.setLimit(test.base + 255);
                     test.setPriority(priority);
                     //alert("Test.PID = " + test.PID);
-                    if (_pidsave == 3) {
+                    if (_pidsave == 4) {
                         _pidsave = 1;
                     }
                     else {
@@ -536,23 +541,29 @@ module TSOS {
                     if (_Processes.length < 3) {
 
                         _Processes = _Processes.concat(test);
-                        //alert("Added :" + test.PID)
-                    }
-                    else {
-                        _Processes[test.PID - 1] = test;
-                    }
-                    //alert(_Processes);
-                    var offset = 256 * (_Processes.length - 1);
-                    for (var h = 0; h < program.length; h++) {
-                        _MemoryHandler.load(program[h], h + offset);
-                        _CPUElement.focus();
-                        _Canvas.focus();
+                        var offset = 256 * (_Processes.length - 1);
+                        for (var h = 0; h < program.length; h++) {
+                            _MemoryHandler.load(program[h], h + offset);
+                            _CPUElement.focus();
+                            _Canvas.focus();
 
+                        }
+                        _MemoryHandler.updateMem();
                     }
-                    //alert("added to memory");
+                    else
+                    {
+                        _Processes = _Processes.concat(test);
+                        var filename = "Process" + test.PID;
+                        var buffer = "";
+                        for(var h = 0; h < program.length; h++)
+                        {
+                            buffer = buffer + program[h];
+                        }
+                        var t = _HardDriveDriver.createFile(filename);
+                        _HardDriveDriver.writeToFile(filename, buffer);
+                        test.setHardDriveLoc(t);
+                    }
 
-
-                    _MemoryHandler.updateMem();
                 }
             }
             else
@@ -715,7 +726,7 @@ module TSOS {
             }
             if(_CPU.scheduling == "priority")
             {
-            _ReadyQueue.sortQueue(); 
+            _ReadyQueue.sortQueue();
                 }
             _CPU.isExecuting = true;
             _currentProcess = 0;
@@ -748,7 +759,8 @@ module TSOS {
         //create a file in memory
         public shellCreateFile(fileName)
         {
-            _HardDriveDriver.createFile(fileName);
+           var t = _HardDriveDriver.createFile(fileName);
+            _StdOut.putText("Successfully created file at location: " + t);
         }
         public shellListDirectory()
         {
@@ -756,11 +768,21 @@ module TSOS {
         }
         public shellDeleteFile(fileName)
         {
-            _HardDriveDriver.deleteFile(fileName);
+            var success = _HardDriveDriver.deleteFile(fileName);
+            if(success)
+            {
+                _StdOut.putText("Successfully removed file");
+            }
+            else
+            {
+                _StdOut.putText("Error: file not found.")
+            }
         }
         public shellReadFile(fileName)
         {
-            _HardDriveDriver.readFromFile(fileName);
+           var out = _HardDriveDriver.readFromFile(fileName);
+            _StdOut.putText(out);
+            _StdOut.advanceLine();
         }
         public shellWriteFile(args)
         {
@@ -770,7 +792,8 @@ module TSOS {
                 var data = args[1];
                 if(data.substring(0, 1) == '"' && '"'  == data.substring(data.length - 1))
                 {
-                    _HardDriveDriver.writeToFile(fileName, data.substring(1, data.length - 1));
+                   _HardDriveDriver.writeToFile(fileName, data.substring(1, data.length - 1));
+
                 }
                 else
                 {
