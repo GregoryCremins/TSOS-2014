@@ -52,7 +52,7 @@ module TSOS
                if(_HardDrive.getValue(targetLoc).charAt(0) == '0')
                 {
                     _HardDrive.setValue(targetLoc, "1" + fileName);
-                    alert("createed file " + fileName + "at location " + targetLoc);
+                    //alert("createed file " + fileName + "at location " + targetLoc);
                     target = true;
                 }
                else
@@ -153,7 +153,7 @@ module TSOS
                     {
                         currentLoc = "0" + currentLoc;
                     }
-                    alert("Write to:" + currentLoc);
+                    //alert("Write to:" + currentLoc);
                     //then we begin the write.
                     var counter = 0;
                     _HardDrive.setValue(currentLoc, 1)
@@ -178,7 +178,8 @@ module TSOS
                             currentLoc = nextLocString;
                         }
                     }
-                    _StdOut.putText("Data successfully written to memory");
+                    _StdOut.putText("Data successfully written to hard drive");
+                    _StdOut.advanceLine();
                 }
                 //if we did not find a large enough space to put the data, throw error
                 else
@@ -233,6 +234,7 @@ module TSOS
                         dataLoc += 1;
                         outString = outString + currentData.substr(1, 61);
                     }
+                    //alert("READ " + outString);
                     return outString;
                 }
                 else
@@ -291,7 +293,7 @@ module TSOS
             }
             else
             {
-                alert("Delete error: File not found");
+                //alert("Delete error: File not found");
                 return false;
             }
         }

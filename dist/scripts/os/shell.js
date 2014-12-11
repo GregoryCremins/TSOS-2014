@@ -499,7 +499,7 @@ var TSOS;
                     test.setPID(_pidsave);
                     var thing = _pidsave;
                     if (_pidsave > 3) {
-                        thing = (_pidsave % 3);
+                        thing = 1;
                     }
                     test.setPCval(256 * (thing - 1));
                     test.setBase(256 * (thing - 1));
@@ -507,11 +507,7 @@ var TSOS;
                     test.setPriority(priority);
 
                     //alert("Test.PID = " + test.PID);
-                    if (_pidsave == 4) {
-                        _pidsave = 1;
-                    } else {
-                        _pidsave = _pidsave + 1;
-                    }
+                    _pidsave = _pidsave + 1;
 
                     //Handle multiple Processes
                     if (_Processes.length < 3) {
@@ -533,6 +529,7 @@ var TSOS;
                         var t = _HardDriveDriver.createFile(filename);
                         _HardDriveDriver.writeToFile(filename, buffer);
                         test.setHardDriveLoc(t);
+                        _MemoryHandler.updateMem();
                     }
                 }
             } else {

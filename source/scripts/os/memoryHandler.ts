@@ -118,6 +118,10 @@ module TSOS {
             if (offset < 0) {
                 offset = 0;
             }
+            if(_Processes.length > 0 && _currentProcess > 0)
+            {
+             offset = _Processes[_currentProcess - 1].base;
+            }
             var curRow = null;
             for (var i = 0; i < 256; i++)
             {

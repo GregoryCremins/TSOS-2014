@@ -46,7 +46,8 @@ var TSOS;
             while (targetLoc != "077" && target == false) {
                 if (_HardDrive.getValue(targetLoc).charAt(0) == '0') {
                     _HardDrive.setValue(targetLoc, "1" + fileName);
-                    alert("createed file " + fileName + "at location " + targetLoc);
+
+                    //alert("createed file " + fileName + "at location " + targetLoc);
                     target = true;
                 } else {
                     var location = parseInt("0" + targetLoc, 8);
@@ -129,8 +130,8 @@ var TSOS;
                     while (currentLoc.length < 3) {
                         currentLoc = "0" + currentLoc;
                     }
-                    alert("Write to:" + currentLoc);
 
+                    //alert("Write to:" + currentLoc);
                     //then we begin the write.
                     var counter = 0;
                     _HardDrive.setValue(currentLoc, 1);
@@ -155,7 +156,8 @@ var TSOS;
                             currentLoc = nextLocString;
                         }
                     }
-                    _StdOut.putText("Data successfully written to memory");
+                    _StdOut.putText("Data successfully written to hard drive");
+                    _StdOut.advanceLine();
                 } else {
                     _StdOut.putText("Write Error: No large enough space exists for data. Try clearing some files and try again.");
                 }
@@ -197,6 +199,8 @@ var TSOS;
                         dataLoc += 1;
                         outString = outString + currentData.substr(1, 61);
                     }
+
+                    //alert("READ " + outString);
                     return outString;
                 } else {
                     _StdOut.putText("File exists, but there is no data");
@@ -243,7 +247,7 @@ var TSOS;
                     return true;
                 }
             } else {
-                alert("Delete error: File not found");
+                //alert("Delete error: File not found");
                 return false;
             }
         };

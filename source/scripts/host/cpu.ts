@@ -334,7 +334,8 @@ module TSOS {
                         // alert(_MemoryHandler.read(this.PC + 1) + ": Target in mem");
                         var offset = parseInt("0x" + _MemoryHandler.read(this.PC + 1));
                         this.PC = this.PC + offset;
-                        if (this.PC > 255 + ((_currentProcess - 1 ) * 256)) {
+                        if (this.PC > _Processes[_currentProcess - 1].limit)
+                        {
                             this.PC = this.PC - 255;
                             if (!this.checkbounds(this.PC)) {
                                 _StdOut.putText("ERROR on D0: Index out of bounds error on process " + _currentProcess);
@@ -471,6 +472,8 @@ module TSOS {
             }
             else
             {
+               // alert(nextProcess == null);
+                //alert("ROLLOUT AUTOBOT : " + nextProcess.PID);
                 this.rollIn(nextProcess);
             }
 
@@ -500,8 +503,9 @@ module TSOS {
         public rollOut()
         {
             var targetFile = "Process" + _currentProcess;
-            alert("name of file =" + targetFile);
+            //alert("name of file =" + targetFile);
             var buffer = "";
+            var zeroCombo = 0;
             for(var i = this.base; i < this.limit; i++)
             {
                 buffer = buffer + this.toHexDigit(_MemoryHandler.read(i));
@@ -511,6 +515,7 @@ module TSOS {
             _Processes[_currentProcess - 1].setHardDriveLoc(holder);
             _HardDriveDriver.writeToFile(targetFile, buffer);
             _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
+         //   alert(_Processes[_currentProcess - 1].base + " target base");
             return _Processes[_currentProcess - 1].base;
             //alert(nextProcess.PID + " PC = " + this.PC);
             // alert(this.PC == nextProcess.PC);
@@ -522,21 +527,40 @@ module TSOS {
             //alert(nextProcess.PID + " PC = " + this.PC);
             // alert(this.PC == nextProcess.PC);
             var temp = this.rollOut();
+            process.PC = process.PC - process.base;
+            process.setBase(temp);
+            process.setLimit(temp + 255);
+            process.PC = process.PC + temp;
+          //  alert("Process " + process.PID +  " has pc of " + process.PC + "which should be in between " + process.base + "and " +process.limit);
             process.loadToCPU();
             _currentProcess = process.PID;
+           // alert("ROLLING IN " +_currentProcess);
             _HardDriveDriver.deleteFile(fileName);
-            alert("base" + temp);
+          //  alert("HEEERE");
+           // alert("base " + temp);
+            //var zeroCombo = 1;
             for(var i = process.base; i < process.limit; i++)
             {
-                alert("HALP" + i);
-                alert(buffer.substring(0,2));
-                _MemoryHandler.load(buffer.substring(0,2), i);
-                alert("value = " +_MemoryHandler.read(i));
+                //alert("HALP" + i);
+                //alert(buffer.substring(0,2));
+                if(buffer.substring(0,2) == undefined)
+                {
+                    _MemoryHandler.load("00",i);
+                }
+                else {
+                    _MemoryHandler.load(buffer.substring(0, 2), i);
+                }
+                //alert("value = " +_MemoryHandler.read(i));
                 buffer = buffer.substring(2,buffer.length);
+                //if we are at the end of the file, fill 0's
+                if(buffer.length == 0)
+                {
+                   buffer = "00";
+                }
 
             }
             _MemoryHandler.updateMem();
-            alert("finito");
+          //  alert("finito");
             process.setHardDriveLoc("N/A");
         }
 
