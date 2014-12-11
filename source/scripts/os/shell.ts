@@ -82,7 +82,7 @@ module TSOS {
                                     "<string> - Sets the status");
             this.commandList[this.commandList.length] = sc;
             //load
-            sc = new ShellCommand(this.shellLoad, "load", "Loads the program input area value, optional parameter of priority");
+            sc = new ShellCommand(this.shellLoad, "load", "Loads the program input area value");
             this.commandList[this.commandList.length] = sc;
             //run
             sc = new ShellCommand(this.shellRun, "run","<int> - Runs the process with the given pid");
@@ -123,18 +123,37 @@ module TSOS {
             sc = new ShellCommand(this.shellPS, "ps", "-Lists all running processes");
             this.commandList[this.commandList.length] = sc;
 
-            //change the scheduling algorithm
-            sc = new ShellCommand(this.shellSetSchedule,
-                "setschedule",
-                "<string> - Sets the current scheduling algorithm");
-            this.commandList[this.commandList.length] = sc;
-
             // kill <id> - kills the specified process id.
-            sc = new ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process");
+            sc = new ShellCommand(this.shellKillProcess, "kill", "<int> -Kills the specified process ")
             this.commandList[this.commandList.length] = sc;
 
+            //create <filename>- creates a file in the page table
+            sc = new ShellCommand(this.shellCreateFile, "create", "<string> -Creates a file in the page table.");
+            this.commandList[this.commandList.length] = sc;
 
+            // ls - lists the files in the page table
+            sc = new ShellCommand(this.shellListDirectory, "ls", "Lists all files in memory");
+            this.commandList[this.commandList.length] = sc;
 
+            //write <filename> - read from the file if it exists
+            sc = new ShellCommand(this.shellWriteFile, "write", "<string> \"<string>\" - writes the data enclosed in quotes to the file with the given filename");
+            this.commandList[this.commandList.length] = sc;
+
+            //delete <filename> -deletes a file
+            sc = new ShellCommand(this.shellDeleteFile, "delete", "<string> - deletes the specified file from the hard drive");
+            this.commandList[this.commandList.length] = sc;
+
+            //read <filename> - read a file
+            sc = new ShellCommand(this.shellReadFile, "read", "<string> -reads the contents of a file in memory");
+            this.commandList [this.commandList.length] = sc;
+
+            //format
+            sc = new ShellCommand(this.shellFormat, "format", "- Formats the hard drive");
+            this.commandList [this.commandList.length] = sc;
+
+            //setschedule <schedule> - set the scheduling algorithm
+            sc = new ShellCommand(this.shellSetSchedule, "setschedule", "<string> - sets the scheduling algorithm")
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -444,28 +463,6 @@ module TSOS {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
             }
         }
-
-        //change the scheduling algorithm
-        public shellSetSchedule(args)
-        {
-            if(args.length > 0) {
-                var algo = args[0];
-                if (algo == "rr" || algo == "fcfs" || algo == "priority" && !_CPU.isExecuting) {
-                    _CPU.scheduling = algo;
-                    _CPU.updateUI();
-                }
-                else {
-                    if (_CPU.isExecuting)
-                        _StdOut.putText("ERROR: Please wait for CPU to complete execution before changing the scheduling.")
-                    else
-                        _StdOut.putText("ERROR: Invalid scheduling algorithm choice.")
-                }
-            }
-            else
-            {
-                _StdOut.putText("Please provide an correct scheduling algorithm.")
-            }
-        }
         //function to cause a blue screen of death
         public shellBSOD() {
             // Call Kernel trap
@@ -475,13 +472,12 @@ module TSOS {
 
         //function to load the data from the program input into memory
         //the loading actually doesn't work, as of right now it only validates the code
-        public shellLoad(args)
+        public shellLoad(priority)
         {
-            var priority = 0;
-           if(args.length > 0)
-           {
-               priority = args[0];
-           }
+            if(priority == null || priority == undefined || priority == "")
+            {
+                priority = 0;
+            }
             var errorFlag = 0;
             var program = _ProgramInput.value.toString().split(" ");
             var isValid = true;
@@ -525,38 +521,45 @@ module TSOS {
                 else {
                     var test = new PCB();
                     test.setPID(_pidsave);
-                    test.setPCval(256 * (_pidsave - 1));
-                    test.setBase(256 * (_pidsave - 1));
+                    var thing = _pidsave;
+                    if(_pidsave > 3)
+                    {
+                        thing = 1;
+                    }
+                    test.setPCval(256 * (thing - 1));
+                    test.setBase(256 * (thing - 1));
                     test.setLimit(test.base + 255);
                     test.setPriority(priority);
                     //alert("Test.PID = " + test.PID);
-                    if (_pidsave == 3) {
-                        _pidsave = 1;
-                    }
-                    else {
                         _pidsave = _pidsave + 1;
-                    }
                     //Handle multiple Processes
                     if (_Processes.length < 3) {
 
                         _Processes = _Processes.concat(test);
-                        //alert("Added :" + test.PID)
-                    }
-                    else {
-                        _Processes[test.PID - 1] = test;
-                    }
-                    //alert(_Processes);
-                    var offset = 256 * (_Processes.length - 1);
-                    for (var h = 0; h < program.length; h++) {
-                        _MemoryHandler.load(program[h], h + offset);
-                        _CPUElement.focus();
-                        _Canvas.focus();
+                        var offset = 256 * (_Processes.length - 1);
+                        for (var h = 0; h < program.length; h++) {
+                            _MemoryHandler.load(program[h], h + offset);
+                            _CPUElement.focus();
+                            _Canvas.focus();
 
+                        }
+                        _MemoryHandler.updateMem();
                     }
-                    //alert("added to memory");
+                    else
+                    {
+                        _Processes = _Processes.concat(test);
+                        var filename = "Process" + test.PID;
+                        var buffer = "";
+                        for(var h = 0; h < program.length; h++)
+                        {
+                            buffer = buffer + program[h];
+                        }
+                        var t = _HardDriveDriver.createFile(filename);
+                        _HardDriveDriver.writeToFile(filename, buffer);
+                        test.setHardDriveLoc(t);
+                        _MemoryHandler.updateMem();
+                    }
 
-
-                    _MemoryHandler.updateMem();
                 }
             }
             else
@@ -591,11 +594,11 @@ module TSOS {
                 if(_CPU.isExecuting)
                 {
                     _ReadyQueue.enqueue(_Processes[pid - 1]);
-                    //check if we need to sort the queue by priority
-                    if(_CPU.scheduling == "priority");
+                    if(_CPU.scheduling == "priority")
                     {
-                        _ReadyQueue.sortByPriority();
-                    }
+                        _ReadyQueue.sortQueue();
+                        }
+                    //alert("ON THE READY QUEUE");
                 }
                 else
                 {
@@ -717,7 +720,10 @@ module TSOS {
             {
                 _ReadyQueue.enqueue(_Processes[i]);
             }
-            _ReadyQueue.sortByPriority();
+            if(_CPU.scheduling == "priority")
+            {
+            _ReadyQueue.sortQueue();
+                }
             _CPU.isExecuting = true;
             _currentProcess = 0;
             //alert(_currentProcess);
@@ -746,20 +752,76 @@ module TSOS {
                 _StdOut.putText("There are no running processes.");
             }
         }
-
-        public shellGetSchedule()
+        //create a file in memory
+        public shellCreateFile(fileName)
         {
-            if(_CPU.scheduling == "rr")
+           var t = _HardDriveDriver.createFile(fileName);
+            _StdOut.putText("Successfully created file at location: " + t);
+        }
+        public shellListDirectory()
+        {
+            _HardDriveDriver.listHardDrive();
+        }
+        public shellDeleteFile(fileName)
+        {
+            var success = _HardDriveDriver.deleteFile(fileName);
+            if(success)
             {
-                _StdOut.putText("The current schedule is round robin.");
+                _StdOut.putText("Successfully removed file");
             }
-            if(_CPU.scheduling == "priority")
+            else
             {
-                _StdOut.putText("The current schedule is priority.");
+                _StdOut.putText("Error: file not found.")
             }
-            if(_CPU.scheduling == "fcfs")
+        }
+        public shellReadFile(fileName)
+        {
+           var out = _HardDriveDriver.readFromFile(fileName);
+            _StdOut.putText(out);
+            _StdOut.advanceLine();
+        }
+        public shellWriteFile(args)
+        {
+            if(args.length == 2)
             {
-                _StdOut.putText("The current schedule is first come first serve.");
+                var fileName = args[0];
+                var data = args[1];
+                if(data.substring(0, 1) == '"' && '"'  == data.substring(data.length - 1))
+                {
+                   _HardDriveDriver.writeToFile(fileName, data.substring(1, data.length - 1));
+
+                }
+                else
+                {
+                    _StdOut.putText("Please surround the data with quotes");
+                }
+            }
+            else
+            {
+                _StdOut.putText("Please provide 2 arguements, the file name and the data to be written");
+            }
+        }
+        public shellFormat()
+        {
+            _HardDriveDriver.formatHardDrive();
+        }
+
+        public shellSetSchedule(scheduling)
+        {
+            if(!_CPU.isExecuting) {
+                if (scheduling == "priority" || scheduling == "fcfs" || scheduling == "rr") {
+                    _CPU.scheduling = scheduling;
+                    _StdOut.putText("Scheduling set");
+                    _CPU.updateUI();
+                }
+                else {
+                    _StdOut.putText("Error: Invalid scheduling chosen. Please choose either rr, priority, or fcfs");
+                }
+
+            }
+            else
+            {
+                _StdOut.putText("Please wait for CPU to finish executing before changing the scheduling")
             }
         }
     }

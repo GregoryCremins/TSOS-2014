@@ -39,28 +39,27 @@ var TSOS;
             }
             return retVal;
         };
-        Queue.prototype.sortByPriority = function () {
-            //redundant check
-            if (_CPU != null) {
-                var holdingArray = new TSOS.PCB[0]();
-                while (this.getSize() > 0) {
-                    holdingArray.pubh(this.dequeue());
-                }
+        Queue.prototype.sortQueue = function () {
+            //first store all of the pcb's to an array
+            var temp = new Array();
+            while (this.getSize() > 0) {
+                var target = this.dequeue();
+                temp[temp.length] = target;
+            }
 
-                while (holdingArray.length > 0) {
-                    var indexOfHigh = -1;
-                    var valueOfHigh = null;
+            alert(temp.length);
 
-                    for (var i = 0; i < holdingArray.length; i++) {
-                        if (indexOfHigh == -1 || holdingArray[i].priority > valueOfHigh) {
-                            indexOfHigh = i;
-                            valueOfHigh = holdingArray[i];
-                        }
+            while (temp.length > 0) {
+                var maxIndex = -1;
+                var maxVal = -1;
+                for (var i = 0; i < temp.length; i++) {
+                    if (temp[i].getPriority() > maxVal) {
+                        maxIndex = i;
+                        maxVal = temp[i].getPriority();
                     }
-                    var target = holdingArray[indexOfHigh];
-                    this.enqueue(target);
-                    holdingArray.splice(indexOfHigh, 1);
                 }
+                this.enqueue(temp[maxIndex]);
+                temp.splice(maxIndex, 1);
             }
         };
         return Queue;

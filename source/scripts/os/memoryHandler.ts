@@ -15,6 +15,7 @@ module TSOS {
         //loads an item into memory
         public load(mem, index)
         {
+            //alert(mem);
             if(typeof(mem) == typeof(123))
             {
                 //it is a hex digit, we need to do conversion
@@ -35,6 +36,10 @@ module TSOS {
             }
             else
             {
+                if(mem == undefined)
+                {
+                    mem = "00"
+                }
                 //otherwise, its already disassembly
                 _Memory[index] = mem;
                 this.updateMem();
@@ -113,6 +118,10 @@ module TSOS {
             if (offset < 0) {
                 offset = 0;
             }
+            if(_Processes.length > 0 && _currentProcess > 0)
+            {
+             offset = _Processes[_currentProcess - 1].base;
+            }
             var curRow = null;
             for (var i = 0; i < 256; i++)
             {
@@ -147,7 +156,7 @@ module TSOS {
                 var testProcess = _ReadyQueue.dequeue();
                 resultQueue2.enqueue(testProcess);
                 var row = <HTMLTableRowElement> readyQueueTable.insertRow();
-                for (var j = 0; j < 8; j++) {
+                for (var j = 0; j <10; j++) {
                     var targetCell = row.insertCell(j);
                     switch (j) {
                         case 0:
@@ -188,6 +197,16 @@ module TSOS {
                         case 7:
                         {
                             targetCell.innerHTML = "0x" + testProcess.toHexDigit(testProcess.limit);
+                            break;
+                        }
+                        case 8:
+                        {
+                            targetCell.innerHTML = "" + testProcess.getPriority();
+                            break;
+                        }
+                        case 9:
+                        {
+                            targetCell.innerHTML = testProcess.getHardDriveLoc();
                             break;
                         }
                         default:

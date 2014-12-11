@@ -44,6 +44,10 @@ module TSOS {
             _StatusHandler = new TSOS.statusBarHander();
 
 
+            //initialize hard drive
+            _HardDriveDriver = new TSOS.deviceDriverHardDrive();
+
+
             //create memory
             _MemoryHandler = new memory();
             _CPUElement = (<HTMLInputElement>document.getElementById("CPU"));

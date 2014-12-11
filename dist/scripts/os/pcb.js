@@ -15,6 +15,7 @@ var TSOS;
             this.base = 0;
             this.limit = 0;
             this.priority = 0;
+            this.hardDriveLoc = "N/A";
         }
         PCB.prototype.PCB = function (PC, Acc, Xreg, Yreg, Zflag) {
             if (typeof PC === "undefined") { PC = 0; }
@@ -27,10 +28,6 @@ var TSOS;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
-        };
-
-        PCB.prototype.getPID = function () {
-            return this.PID;
         };
 
         PCB.prototype.setPID = function (val) {
@@ -50,6 +47,16 @@ var TSOS;
         };
         PCB.prototype.setPriority = function (val) {
             this.priority = val;
+        };
+
+        PCB.prototype.getPriority = function () {
+            return this.priority;
+        };
+        PCB.prototype.setHardDriveLoc = function (loc) {
+            this.hardDriveLoc = loc;
+        };
+        PCB.prototype.getHardDriveLoc = function () {
+            return this.hardDriveLoc;
         };
 
         /**
@@ -81,7 +88,7 @@ var TSOS;
         PCB.prototype.printToScreen = function () {
             //new PCB writer
             var newRow = _PCBElement.insertRow();
-            for (var j = 0; j < 9; j++) {
+            for (var j = 0; j < 10; j++) {
                 var targetCell = newRow.insertCell(j);
                 switch (j) {
                     case 0: {
@@ -117,7 +124,11 @@ var TSOS;
                         break;
                     }
                     case 8: {
-                        targetCell.innerHTML = "" + this.priority;
+                        targetCell.innerHTML = " " + this.priority;
+                        break;
+                    }
+                    case 9: {
+                        targetCell.innerHTML = this.hardDriveLoc;
                         break;
                     }
                     default: {

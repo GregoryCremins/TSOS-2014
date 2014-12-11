@@ -10,7 +10,7 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME = "BEUOS";
-var APP_VERSION = "Hyper Turbo EX Dynamic 4.0";
+var APP_VERSION = "Hyper Turbo EX Dynamic Ultra 5.0";
 
 //The current location for whereami
 var STAGE = 0;
@@ -39,6 +39,10 @@ var KEYBOARD_IRQ = 1;
 
 //program input
 var _ProgramInput = null;
+
+//hard drive
+var _HardDrive = new TSOS.hardDrive();
+var _HardDriveDriver = null;
 
 //
 // Global Variables

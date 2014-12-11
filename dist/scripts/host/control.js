@@ -37,6 +37,9 @@ var TSOS;
             _StatusContext = _StatusCanvas.getContext("2d");
             _StatusHandler = new TSOS.statusBarHander();
 
+            //initialize hard drive
+            _HardDriveDriver = new TSOS.deviceDriverHardDrive();
+
             //create memory
             _MemoryHandler = new TSOS.memory();
             _CPUElement = document.getElementById("CPU");

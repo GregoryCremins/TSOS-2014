@@ -13,7 +13,7 @@
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var APP_NAME: string    = "BEUOS";   // Beat'em up OS
-var APP_VERSION: string = "Hyper Turbo EX Dynamic 4.0";   // The Forever exalted supreme 4th edition extra editions will be be indicated.
+var APP_VERSION: string = "Hyper Turbo EX Dynamic Ultra 5.0";   // The Final triumphant 5th edition extra editions will be be indicated.
 //The current location for whereami
 var STAGE: number = 0;
 //the status
@@ -40,6 +40,9 @@ var KEYBOARD_IRQ: number = 1;
 //program input
 var _ProgramInput = null; // Initialized in hostinit
 
+//hard drive
+ var _HardDrive = new TSOS.hardDrive();
+ var _HardDriveDriver = null;
 //
 // Global Variables
 //

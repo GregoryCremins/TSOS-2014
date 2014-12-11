@@ -42,16 +42,19 @@ var TSOS;
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
-            this.scheduling = "rr";
         };
 
         Cpu.prototype.cycle = function () {
-            //context swap if rr
+            //context swap
             if ((this.runningCycleCount % _quantum) == 0 && _ReadyQueue.getSize() > 0 && this.runningCycleCount > 0 && this.scheduling == "rr") {
                 if (_currentProcess == 0) {
                     _Kernel.krnTrace('Completed Program ' + _currentProcess);
                     var process = _ReadyQueue.dequeue();
-                    process.loadToCPU();
+                    if (process.getHardDriveLoc() != "N/A") {
+                        this.rollIn(process);
+                    } else {
+                        process.loadToCPU();
+                    }
                     _currentProcess = process.PID;
                     _Kernel.krnTrace('Loading Program ' + _currentProcess);
                     this.runningCycleCount = 0;
@@ -69,11 +72,14 @@ var TSOS;
                     _Kernel.krnTrace('Completed all execution');
                     this.isExecuting = false;
                 } else {
-                    //otherwise check if we need to do a different context swap
                     if (_currentProcess == 0 && _ReadyQueue.getSize() != 0) {
                         _Kernel.krnTrace('Completed Program ' + _currentProcess);
                         var process = _ReadyQueue.dequeue();
-                        process.loadToCPU();
+                        if (process.getHardDriveLoc() != "N/A") {
+                            this.rollIn(process);
+                        } else {
+                            process.loadToCPU();
+                        }
                         _currentProcess = process.PID;
                         _Kernel.krnTrace('Loading Program ' + _currentProcess);
                         this.runningCycleCount = 0;
@@ -100,7 +106,6 @@ var TSOS;
             _CPUElement.value += "Xreg: 0x" + this.toHexDigit(this.Xreg) + "\n";
             _CPUElement.value += "Yreg: 0x" + this.toHexDigit(this.Yreg) + "\n";
             _CPUElement.value += "Zflag: 0x" + this.toHexDigit(this.Zflag) + "\n";
-            _CPUElement.value += "CurrentProcess: " + _currentProcess + "\n";
             _CPUElement.value += "Scheduling: " + this.scheduling + "\n";
         };
 
@@ -306,7 +311,7 @@ var TSOS;
                         // alert(_MemoryHandler.read(this.PC + 1) + ": Target in mem");
                         var offset = parseInt("0x" + _MemoryHandler.read(this.PC + 1));
                         this.PC = this.PC + offset;
-                        if (this.PC > 255 + ((_currentProcess - 1) * 256)) {
+                        if (this.PC > _Processes[_currentProcess - 1].limit) {
                             this.PC = this.PC - 255;
                             if (!this.checkbounds(this.PC)) {
                                 _StdOut.putText("ERROR on D0: Index out of bounds error on process " + _currentProcess);
@@ -422,9 +427,15 @@ var TSOS;
         Cpu.prototype.contextSwitch = function () {
             //alert("Swapping contexts");
             this.storeToPCB(_currentProcess);
-            _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
             var nextProcess = _ReadyQueue.dequeue();
-            nextProcess.loadToCPU();
+            if (nextProcess.getHardDriveLoc() == "N/A") {
+                _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
+                nextProcess.loadToCPU();
+            } else {
+                // alert(nextProcess == null);
+                //alert("ROLLOUT AUTOBOT : " + nextProcess.PID);
+                this.rollIn(nextProcess);
+            }
 
             //alert(nextProcess.PID + " PC = " + this.PC);
             // alert(this.PC == nextProcess.PC);
@@ -447,6 +458,68 @@ var TSOS;
         */
         Cpu.prototype.toHexDigit = function (dec) {
             return dec.toString(16);
+        };
+
+        Cpu.prototype.rollOut = function () {
+            var targetFile = "Process" + _currentProcess;
+
+            //alert("name of file =" + targetFile);
+            var buffer = "";
+            var zeroCombo = 0;
+            for (var i = this.base; i < this.limit; i++) {
+                buffer = buffer + this.toHexDigit(_MemoryHandler.read(i));
+            }
+            var found = _HardDriveDriver.deleteFile(targetFile);
+            var holder = _HardDriveDriver.createFile(targetFile);
+            _Processes[_currentProcess - 1].setHardDriveLoc(holder);
+            _HardDriveDriver.writeToFile(targetFile, buffer);
+            _ReadyQueue.enqueue(_Processes[_currentProcess - 1]);
+
+            //   alert(_Processes[_currentProcess - 1].base + " target base");
+            return _Processes[_currentProcess - 1].base;
+            //alert(nextProcess.PID + " PC = " + this.PC);
+            // alert(this.PC == nextProcess.PC);
+        };
+        Cpu.prototype.rollIn = function (process) {
+            var fileName = "Process" + process.PID;
+            var buffer = "" + _HardDriveDriver.readFromFile(fileName);
+
+            //alert(nextProcess.PID + " PC = " + this.PC);
+            // alert(this.PC == nextProcess.PC);
+            var temp = this.rollOut();
+            process.PC = process.PC - process.base;
+            process.setBase(temp);
+            process.setLimit(temp + 255);
+            process.PC = process.PC + temp;
+
+            //  alert("Process " + process.PID +  " has pc of " + process.PC + "which should be in between " + process.base + "and " +process.limit);
+            process.loadToCPU();
+            _currentProcess = process.PID;
+
+            // alert("ROLLING IN " +_currentProcess);
+            _HardDriveDriver.deleteFile(fileName);
+
+            for (var i = process.base; i < process.limit; i++) {
+                //alert("HALP" + i);
+                //alert(buffer.substring(0,2));
+                if (buffer.substring(0, 2) == undefined) {
+                    _MemoryHandler.load("00", i);
+                } else {
+                    _MemoryHandler.load(buffer.substring(0, 2), i);
+                }
+
+                //alert("value = " +_MemoryHandler.read(i));
+                buffer = buffer.substring(2, buffer.length);
+
+                //if we are at the end of the file, fill 0's
+                if (buffer.length == 0) {
+                    buffer = "00";
+                }
+            }
+            _MemoryHandler.updateMem();
+
+            //  alert("finito");
+            process.setHardDriveLoc("N/A");
         };
         return Cpu;
     })();
