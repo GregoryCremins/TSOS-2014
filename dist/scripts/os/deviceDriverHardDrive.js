@@ -74,7 +74,6 @@ var TSOS;
                 //if we found it, stop looping
                 var targetobj = _HardDrive.getValue(pageLoc);
                 var f = _HardDrive.getValue(pageLoc).indexOf(fileName);
-                alert(f);
                 if (_HardDrive.getValue(pageLoc).charAt(0) == '1' && f > -1) {
                     foundFile = true;
                 } else {
